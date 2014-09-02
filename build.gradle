@@ -1,0 +1,110 @@
+apply plugin: 'groovy'
+apply plugin: 'codenarc'
+apply plugin: 'maven-publish'
+
+def projectArtifactId = 'asciidoctorj-groovy-dsl'
+def groupId = 'org.asciidoctor'
+
+repositories {
+    jcenter()
+    maven { url 'http://dl.bintray.com/lordofthejars/maven'}
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:1.8.9'
+    compile 'org.asciidoctor:asciidoctorj:1.5.0'
+    testCompile('org.spockframework:spock-core:0.7-groovy-1.8') {
+        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+        exclude group: 'org.hamcrest', module: 'hamcrest-core'
+    }
+    testCompile 'junit:junit:4.11'
+    testCompile 'cglib:cglib-nodep:2.2.2'
+    testCompile 'org.jsoup:jsoup:1.7.3'
+}
+
+codenarc {
+    configFile = file('config/codenarc/codenarc.groovy')
+    // run codenarc on production sources only
+    sourceSets = [project.sourceSets.main]
+}
+
+task sourceJar(type: Jar) {
+    group 'Build'
+    description 'An archive of the source code'
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    sourceJar
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.12'
+}
+
+def pomConfig = {
+    name projectArtifactId
+    description 'A Groovy DSL that supports easy creation of Asciidoctor extensions'
+    url 'http://asciidoctor.org'
+    inceptionYear '2014'
+    licenses {
+        license([:]) {
+            name 'The Apache Software License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution 'repo'
+        }
+    }
+    scm {
+        url 'https://github.com/robertpanzer/asciidoctorj-groovy-dsl'
+    }
+    developers {
+        developer {
+            id 'mojavelinux'
+            name 'Dan Allen'
+            roles {
+                role 'Asciidoctor Founder and Benevolent Dictator'
+                role 'Open Source Hero'
+            }
+        }
+        [
+            bobbytank42: 'Robert Panzer',
+        ].each { devId, devName ->
+            developer {
+                id devId
+                name devName
+                roles {
+                    role 'Developer'
+                }
+            }
+        }
+    }
+    contributors {
+        [].each { devId, devName ->
+            contributor {
+                name devName
+                roles {
+                    role 'contributor'
+                }
+            }
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenCustom(MavenPublication) {
+            from components.java
+            artifact sourceJar
+
+            artifactId = projectArtifactId
+            setGroupId('org.asciidoctor')
+            setVersion('0.1-SNAPSHOT')
+            pom.withXml {
+                asNode().children().last() + pomConfig
+            }
+        }
+    }
+}
+
+
