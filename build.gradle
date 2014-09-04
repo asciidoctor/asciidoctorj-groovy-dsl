@@ -1,6 +1,17 @@
+buildscript {
+     repositories {
+         mavenLocal()
+         jcenter()
+     }
+     dependencies {
+         classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5"
+     }
+}
+
 apply plugin: 'groovy'
 apply plugin: 'codenarc'
 apply plugin: 'maven-publish'
+apply from: 'gradle/publish.gradle'
 
 def projectArtifactId = 'asciidoctorj-groovy-dsl'
 def groupId = 'org.asciidoctor'
@@ -42,69 +53,4 @@ artifacts {
 task wrapper(type: Wrapper) {
     gradleVersion = '1.12'
 }
-
-def pomConfig = {
-    name projectArtifactId
-    description 'A Groovy DSL that supports easy creation of Asciidoctor extensions'
-    url 'http://asciidoctor.org'
-    inceptionYear '2014'
-    licenses {
-        license([:]) {
-            name 'The Apache Software License, Version 2.0'
-            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-            distribution 'repo'
-        }
-    }
-    scm {
-        url 'https://github.com/robertpanzer/asciidoctorj-groovy-dsl'
-    }
-    developers {
-        developer {
-            id 'mojavelinux'
-            name 'Dan Allen'
-            roles {
-                role 'Asciidoctor Founder and Benevolent Dictator'
-                role 'Open Source Hero'
-            }
-        }
-        [
-            bobbytank42: 'Robert Panzer',
-        ].each { devId, devName ->
-            developer {
-                id devId
-                name devName
-                roles {
-                    role 'Developer'
-                }
-            }
-        }
-    }
-    contributors {
-        [].each { devId, devName ->
-            contributor {
-                name devName
-                roles {
-                    role 'contributor'
-                }
-            }
-        }
-    }
-}
-
-publishing {
-    publications {
-        mavenCustom(MavenPublication) {
-            from components.java
-            artifact sourceJar
-
-            artifactId = projectArtifactId
-            setGroupId('org.asciidoctor')
-            setVersion('0.1-SNAPSHOT')
-            pom.withXml {
-                asNode().children().last() + pomConfig
-            }
-        }
-    }
-}
-
 
