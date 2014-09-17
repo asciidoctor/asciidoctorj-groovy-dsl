@@ -14,29 +14,22 @@ The {doctitle} allows to define Asciidoctor extensions in {groovy-url}[Groovy].
 
 == Usage
 
-There is currently no published version of this project.
-To use the DSL you have to clone this repository, build it using `gradlew build publishToMavenLocal`.
+There is currently no version of this project published to Maven or JCenter.
+To use the DSL you have to refer to the repository http://dl.bintray.com/bobbytank42/maven and add a dependency on `org.asciidoctor:asciidoctorj-groovy-dsl:0.1-Alpha1`.
 
-Afterwards you can use the DSL by adding this dependency to your `pom.xml` if you are using Maven:
-
-[source,xml]
-----
-<dependency>
-    <groupId>org.asciidoctor</groupId>
-    <artifactId>asciidoctorj-groovy-dsl</artifactId>
-    <version>0.1-SNAPSHOT</version>
-</dependency>
-----
-
-The integration into a {gradle-url}[Gradle] project is straightforward:
+The integration into a {gradle-url}[Gradle] project is straightforward. To use AsciidoctorJ you also add the JCenter repository and add the respective dependency.
 
 [source,groovy]
 ----
 repositories {
-    mavenLocal()
+    jcenter()
+    maven {
+        url "http://dl.bintray.com/bobbytank42/maven"
+    }
 }
 dependencies {
-    compile 'org.asciidoctor:asciidoctorj-groovy-dsl:0.1-SNAPSHOT'
+    compile 'org.asciidoctor:asciidoctorj:1.5.0.Final'
+    compile 'org.asciidoctor:asciidoctorj-groovy-dsl:0.1.Alpha1'
 }
 ----
 

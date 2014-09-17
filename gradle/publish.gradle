@@ -116,7 +116,7 @@ bintray {
     key = project.bintrayApiKey
     publications = ['mavenCustom']
     pkg {
-        repo = 'asciidoctor'
+        repo = 'maven'
         userOrg = 'bobbytank42'
         name = projectArtifactId
         desc = 'A Groovy DSL that allows to define and register asciidoctor extensions using a DSL'
