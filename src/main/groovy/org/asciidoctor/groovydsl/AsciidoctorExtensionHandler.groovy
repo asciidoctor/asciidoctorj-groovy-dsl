@@ -53,11 +53,11 @@ class AsciidoctorExtensionHandler {
         asciidoctor.javaExtensionRegistry().block(new DelegatingBlockProcessor(options, cl))
     }
 
-    void blockMacro(Map options, Closure cl) {
+    void blockmacro(Map options, Closure cl) {
         asciidoctor.javaExtensionRegistry().blockMacro(new DelegatingBlockMacroProcessor(options[OPTION_NAME], options, cl))
     }
 
-    void blockMacro(String name, Closure cl) {
+    void blockmacro(String name, Closure cl) {
         blockMacro([OPTION_NAME: name], cl)
     }
 
@@ -74,11 +74,11 @@ class AsciidoctorExtensionHandler {
         asciidoctor.javaExtensionRegistry().includeProcessor(new DelegatingIncludeProcessor(options, options[OPTION_FILTER], cl))
     }
 
-    void inlineMacro(Map options, Closure cl) {
+    void inlinemacro(Map options, Closure cl) {
         asciidoctor.javaExtensionRegistry().inlineMacro(new DelegatingInlineMacroProcessor(options[OPTION_NAME], options, cl))
     }
 
-    void inlineMacro(String macroName, Closure cl) {
+    void inlinemacro(String macroName, Closure cl) {
         inlineMacro([OPTION_NAME: macroName], closure: cl)
     }
 

@@ -56,7 +56,7 @@ HELLO WORLD</p>
 
 == Usage
 
-To use the DSL you have to use the dependency `org.asciidoctor:asciidoctorj-groovy-dsl:0.1-Alpha1` from jCenter.
+To use the DSL you have to add a dependency on `org.asciidoctor:asciidoctorj-groovy-dsl:1.0.0.preview1` on jCenter.
 
 The integration into a {gradle-url}[Gradle] project is straightforward. To use AsciidoctorJ you also add the JCenter repository and add the respective dependency.
 
@@ -67,7 +67,7 @@ repositories {
 }
 dependencies {
     compile 'org.asciidoctor:asciidoctorj:1.5.0.Final'
-    compile 'org.asciidoctor:asciidoctorj-groovy-dsl:0.1.Alpha1'
+    compile 'org.asciidoctor:asciidoctorj-groovy-dsl:1.0.0.preview1'
 }
 ----
 
@@ -171,13 +171,13 @@ block('small') {
 
 === BlockMacroProcessor
 
-Block macros processors are registered using the function `blockMacro`.
+Block macros processors are registered using the function `blockmacro`.
 It requires the option `name` that defines the macro name.
 There is also the long form taking the option map and the short form that only takes the name.
 
 [source,groovy]
 ----
-blockMacro (name: 'gist') {
+blockmacro (name: 'gist') {
     parent, target, attributes ->
     String content = """<div class="content"> 
 <script src="https://gist.github.com/${target}.js"></script> 
@@ -203,12 +203,12 @@ The extension will create a passthrough block that finally gets rendered to this
 
 === InlineMacroProcessor
 
-Inline macro processors are registered using the function `inlineMacro`.
+Inline macro processors are registered using the function `inlinemacro`.
 It also requires the `name` option or the name given as the only additional parameter to the closure.
 
 [source,groovy]
 ----
-inlineMacro (name: "man") {
+inlinemacro (name: "man") {
     parent, target, attributes ->
     options=["type": ":link", "target": target + ".html"]
     createInline(parent, "anchor", target, attributes, options).render()
