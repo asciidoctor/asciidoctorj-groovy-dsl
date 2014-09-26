@@ -71,7 +71,9 @@ class AsciidoctorExtensionHandler {
     }
 
     void includeprocessor(Map options=[:], Closure cl) {
-        asciidoctor.javaExtensionRegistry().includeProcessor(new DelegatingIncludeProcessor(options, options[OPTION_FILTER], cl))
+        Closure filter = options[OPTION_FILTER]
+        Map optionsWithoutFilter = options - options.subMap([OPTION_FILTER])
+        asciidoctor.javaExtensionRegistry().includeProcessor(new DelegatingIncludeProcessor(optionsWithoutFilter, filter, cl))
     }
 
     void inlinemacro(Map options, Closure cl) {
