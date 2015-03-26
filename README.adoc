@@ -12,6 +12,10 @@ Robert Panzer <https://github.com/robertpanzer[@bobbytank42]>
 
 The {doctitle} allows to define Asciidoctor extensions in {groovy-url}[Groovy].
 
+ifdef::env-github[]
+image:https://travis-ci.org/asciidoctor/asciidoctorj-groovy-dsl.svg?branch=master["Build Status", link="https://travis-ci.org/asciidoctor/asciidoctorj-groovy-dsl"]
+endif::[]
+
 == Quickstart
 
 To see the DSL in action at once simply fire up `groovyConsole`.
