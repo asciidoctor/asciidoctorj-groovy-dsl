@@ -204,7 +204,7 @@ $ gem install asciidoctor
         rendered.contains('<span class="command">gem install asciidoctor</span>')
     }
 
-    def 'Should apply DocinfoProcessor from Extension file'() {
+    def 'Should apply DocinfoProcessor from Closure'() {
         given:
         String metatag = '<meta name="hello" content="world">'
         AsciidoctorExtensions.extensions {
