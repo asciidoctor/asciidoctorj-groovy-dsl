@@ -17,6 +17,7 @@ package org.asciidoctor.groovydsl
 
 import org.asciidoctor.groovydsl.extensions.DelegatingBlockMacroProcessor
 import org.asciidoctor.groovydsl.extensions.DelegatingBlockProcessor
+import org.asciidoctor.groovydsl.extensions.DelegatingDocinfoProcessor
 import org.asciidoctor.groovydsl.extensions.DelegatingIncludeProcessor
 import org.asciidoctor.groovydsl.extensions.DelegatingPostprocessor
 import org.asciidoctor.groovydsl.extensions.DelegatingPreprocessor
@@ -122,6 +123,10 @@ class AsciidoctorExtensionHandler {
 
     void treeprocessor(Map options=[:], Closure cl) {
         asciidoctor.javaExtensionRegistry().treeprocessor(new DelegatingTreeprocessor(options, cl))
+    }
+
+    void docinfo_processor(Map options=[:], Closure cl) {
+        asciidoctor.javaExtensionRegistry().docinfoProcessor(new DelegatingDocinfoProcessor(options, cl))
     }
 
 }

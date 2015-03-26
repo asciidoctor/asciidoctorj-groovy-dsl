@@ -15,10 +15,12 @@
  */
 package org.asciidoctor.groovydsl
 
-import org.asciidoctor.SafeMode
 import org.asciidoctor.Asciidoctor
+import org.asciidoctor.SafeMode
 import spock.lang.Specification
-import org.asciidoctor.groovydsl.AsciidoctorExtensions
+
+import static org.asciidoctor.OptionsBuilder.options
+
 /**
  * Asciidoctor task inline extensions specification
  *
@@ -201,5 +203,28 @@ $ gem install asciidoctor
         then:
         rendered.contains('<span class="command">gem install asciidoctor</span>')
     }
+
+    def 'Should apply DocinfoProcessor from Extension file'() {
+        given:
+        String metatag = '<meta name="hello" content="world">'
+        AsciidoctorExtensions.extensions {
+            docinfo_processor {
+                document -> metatag
+            }
+        }
+
+        when:
+        String rendered = Asciidoctor.Factory.create().render(
+                '''
+= Hello
+
+World''',
+                options().headerFooter(true).safe(SafeMode.SERVER).toFile(false).get());
+
+        then:
+        // (?ms) Multiline regexp with dotall (= '.' matches newline as well)
+        rendered ==~ /(?ms).*<head>.*<meta name="hello" content="world">.*<\/head>.*/
+    }
+
 
 }
