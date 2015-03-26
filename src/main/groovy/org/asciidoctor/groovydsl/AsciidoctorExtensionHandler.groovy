@@ -61,6 +61,19 @@ class AsciidoctorExtensionHandler {
         blockMacro([OPTION_NAME: name], cl)
     }
 
+    /**
+     * @deprecated Please use {@link #block_macro(java.util.Map, groovy.lang.Closure)} instead
+     */
+    void blockmacro(Map options, Closure cl) {
+        asciidoctor.javaExtensionRegistry().blockMacro(new DelegatingBlockMacroProcessor(options[OPTION_NAME], options, cl))
+    }
+
+    /**
+     * @deprecated Please use {@link #block_macro(java.lang.String, groovy.lang.Closure)} instead
+     */
+    void blockmacro(String name, Closure cl) {
+        blockMacro([OPTION_NAME: name], cl)
+    }
 
     void postprocessor(Map options=[:], Closure cl) {
         asciidoctor.javaExtensionRegistry().postprocessor(new DelegatingPostprocessor(options, cl))
@@ -76,11 +89,34 @@ class AsciidoctorExtensionHandler {
         asciidoctor.javaExtensionRegistry().includeProcessor(new DelegatingIncludeProcessor(optionsWithoutFilter, filter, cl))
     }
 
+    /**
+     * @deprecated Please use {@link #include_processor(java.util.Map, groovy.lang.Closure)} instead
+     */
+    void includeprocessor(Map options=[:], Closure cl) {
+        Closure filter = options[OPTION_FILTER]
+        Map optionsWithoutFilter = options - options.subMap([OPTION_FILTER])
+        asciidoctor.javaExtensionRegistry().includeProcessor(new DelegatingIncludeProcessor(optionsWithoutFilter, filter, cl))
+    }
+
     void inline_macro(Map options, Closure cl) {
         asciidoctor.javaExtensionRegistry().inlineMacro(new DelegatingInlineMacroProcessor(options[OPTION_NAME], options, cl))
     }
 
     void inline_macro(String macroName, Closure cl) {
+        inlineMacro([OPTION_NAME: macroName], closure: cl)
+    }
+
+    /**
+     * @deprecated Please use {@link #inline_macro(java.util.Map, groovy.lang.Closure)} instead
+     */
+    void inlinemacro(Map options, Closure cl) {
+        asciidoctor.javaExtensionRegistry().inlineMacro(new DelegatingInlineMacroProcessor(options[OPTION_NAME], options, cl))
+    }
+
+    /**
+     * @deprecated Please use {@link #inline_macro(java.lang.String, groovy.lang.Closure)} instead
+     */
+    void inlinemacro(String macroName, Closure cl) {
         inlineMacro([OPTION_NAME: macroName], closure: cl)
     }
 
