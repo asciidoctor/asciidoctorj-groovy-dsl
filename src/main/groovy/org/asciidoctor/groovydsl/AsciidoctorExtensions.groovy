@@ -47,20 +47,25 @@ class AsciidoctorExtensions {
     static void registerTo(Asciidoctor asciidoctor) {
         AsciidoctorExtensionHandler extensionHandler = new AsciidoctorExtensionHandler(asciidoctor)
         REGISTERED_EXTENSIONS.each {
+            DelegatingScript script
             switch (it) {
                 case Closure:
                     it.delegate = extensionHandler
                     it.call()
                     break
                 case String:
-                    def shell = makeGroovyShell(extensionHandler)
-                    shell.evaluate(it)
+                    def shell = makeGroovyShell()
+                    script = shell.parse(it)
+                    script.setDelegate(extensionHandler)
+                    script.run()
                     break
                 case File:
-                    def shell = makeGroovyShell(extensionHandler)
+                    def shell = makeGroovyShell()
                     FileReader reader = new FileReader(it)
                     try {
-                        shell.evaluate(reader, it.name)
+                        script = shell.parse(reader, it.name)
+                        script.setDelegate(extensionHandler)
+                        script.run()
                     } finally {
                         reader.close()
                     }
@@ -70,11 +75,10 @@ class AsciidoctorExtensions {
         REGISTERED_EXTENSIONS.clear()
     }
 
-    private static GroovyShell makeGroovyShell(AsciidoctorExtensionHandler extensionHandler) {
+    private static GroovyShell makeGroovyShell() {
         def config = new CompilerConfiguration()
-        def binding = new Binding([extensionHandler: extensionHandler])
 
-        config.scriptBaseClass = AsciidoctorDSLBaseScriptClass.name
+        config.setScriptBaseClass(DelegatingScript.name)
 
         ImportCustomizer importCustomizer = new ImportCustomizer()
         importCustomizer.addStarImports(
@@ -85,7 +89,7 @@ class AsciidoctorExtensions {
         config.addCompilationCustomizers(
                 importCustomizer
                 )
-        new GroovyShell(binding, config)
 
+        new GroovyShell(new Binding(), config)
     }
 }

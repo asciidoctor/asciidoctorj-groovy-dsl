@@ -22,13 +22,14 @@ repositories {
 }
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:1.8.9'
+    compile 'org.codehaus.groovy:groovy-all:2.3.9'
     compile 'org.asciidoctor:asciidoctorj:1.5.2'
-    testCompile('org.spockframework:spock-core:0.7-groovy-1.8') {
+
+    testCompile('org.spockframework:spock-core:1.0-groovy-2.3') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
         exclude group: 'org.hamcrest', module: 'hamcrest-core'
     }
-    testCompile 'junit:junit:4.11'
+    testCompile 'junit:junit:4.12'
     testCompile 'cglib:cglib-nodep:2.2.2'
     testCompile 'org.jsoup:jsoup:1.7.3'
 }
@@ -51,6 +52,6 @@ artifacts {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.12'
+    gradleVersion = '2.3'
 }
 
