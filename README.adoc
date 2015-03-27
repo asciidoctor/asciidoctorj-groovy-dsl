@@ -24,7 +24,7 @@ Then execute this code:
 [source,groovy]
 ----
 @GrabConfig(systemClassLoader=true)
-@Grab(group='org.asciidoctor', module='asciidoctorj-groovy-dsl', version='1.0.0.preview1') // <1>
+@Grab(group='org.asciidoctor', module='asciidoctorj-groovy-dsl', version='1.0.0.preview2') // <1>
 import org.asciidoctor.groovydsl.AsciidoctorExtensions
 import org.asciidoctor.Asciidoctor
 
@@ -60,7 +60,7 @@ HELLO WORLD</p>
 
 == Usage
 
-To use the DSL you have to add a dependency on `org.asciidoctor:asciidoctorj-groovy-dsl:1.0.0.preview1` on jCenter.
+To use the DSL you have to add a dependency on `org.asciidoctor:asciidoctorj-groovy-dsl:1.0.0.preview2` on jCenter.
 
 The integration into a {gradle-url}[Gradle] project is straightforward. To use AsciidoctorJ you also add the JCenter repository and add the respective dependency.
 
@@ -175,13 +175,13 @@ block('small') {
 
 === BlockMacroProcessor
 
-Block macros processors are registered using the function `blockmacro`.
+Block macros processors are registered using the function `block_macro`.
 It requires the option `name` that defines the macro name.
 There is also the long form taking the option map and the short form that only takes the name.
 
 [source,groovy]
 ----
-blockmacro (name: 'gist') {
+block_macro (name: 'gist') {
     parent, target, attributes ->
     String content = """<div class="content"> 
 <script src="https://gist.github.com/${target}.js"></script> 
@@ -207,12 +207,12 @@ The extension will create a passthrough block that finally gets rendered to this
 
 === InlineMacroProcessor
 
-Inline macro processors are registered using the function `inlinemacro`.
+Inline macro processors are registered using the function `inline_macro`.
 It also requires the `name` option or the name given as the only additional parameter to the closure.
 
 [source,groovy]
 ----
-inlinemacro (name: "man") {
+inline_macro (name: "man") {
     parent, target, attributes ->
     options=["type": ":link", "target": target + ".html"]
     createInline(parent, "anchor", target, attributes, options).render()
@@ -275,7 +275,7 @@ postprocessor {
 
 === IncludeProcessor
 
-IncludeProcessor extensions are registered using the function `includeprocessor`.
+IncludeProcessor extensions are registered using the function `include_processor`.
 The options must contain an entry for the key `filter` that points to a closure that decides whether to call this extension for the current include macro.
 
 The following example registers for all include macros that include resource starting with `http`.
@@ -284,7 +284,7 @@ The following example registers for all include macros that include resource sta
 ----
 String content = "The content of the URL"
 
-includeprocessor (filter: {it.startsWith("http")}) {
+include_processor (filter: {it.startsWith("http")}) {
     document, reader, target, attributes ->
     reader.push_include(content, target, target, 1, attributes);					
 }
@@ -316,3 +316,15 @@ treeprocessor {
 }
 ----
 
+=== DocinfoProcessor
+
+DocinfoProcessor extensions are registered using the function `docinfo_processor`.
+
+The following example adds a meta tag to the HTML head element to allow robots to follow links.
+
+[source, groovy]
+----
+docinfo_processor {
+    document -> '<meta name="robots" content="index,follow">'
+}
+----
