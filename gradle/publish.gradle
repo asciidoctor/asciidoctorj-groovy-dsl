@@ -117,7 +117,7 @@ bintray {
     publications = ['mavenCustom']
     pkg {
         repo = 'maven'
-        userOrg = 'bobbytank42'
+        userOrg = 'asciidoctor'
         name = projectArtifactId
         desc = 'A Groovy DSL that allows to define and register asciidoctor extensions using a DSL'
         licenses = ['Apache-2.0']
