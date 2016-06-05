@@ -24,7 +24,7 @@ class DelegatingIncludeProcessor extends IncludeProcessor {
     private final Closure filter
     private final Closure cl
 
-    DelegatingIncludeProcessor(Map options, Closure filter, Closure cl) {
+    DelegatingIncludeProcessor(Map options, Closure filter, @DelegatesTo(IncludeProcessor) Closure cl) {
         super(options)
         this.filter = filter
         this.cl = cl

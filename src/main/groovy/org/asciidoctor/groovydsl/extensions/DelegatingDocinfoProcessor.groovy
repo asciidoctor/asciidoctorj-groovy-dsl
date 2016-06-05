@@ -22,7 +22,7 @@ class DelegatingDocinfoProcessor extends DocinfoProcessor {
 
     final Closure cl
 
-    DelegatingDocinfoProcessor(Map options, Closure cl) {
+    DelegatingDocinfoProcessor(Map options, @DelegatesTo(DocinfoProcessor) Closure cl) {
         super(options)
         this.cl = cl
         cl.delegate = this

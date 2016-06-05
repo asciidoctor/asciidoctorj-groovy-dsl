@@ -22,7 +22,7 @@ class DelegatingTreeprocessor extends Treeprocessor {
 
     private final Closure cl
 
-    DelegatingTreeprocessor(Map options, Closure cl) {
+    DelegatingTreeprocessor(Map options, @DelegatesTo(Treeprocessor) Closure cl) {
         super(options)
         this.cl = cl
         cl.delegate = this

@@ -22,7 +22,7 @@ class DelegatingPostprocessor extends Postprocessor {
 
     final Closure cl
     
-    DelegatingPostprocessor(Map options, Closure cl) {
+    DelegatingPostprocessor(Map options, @DelegatesTo(Postprocessor) Closure cl) {
         super(options)
         this.cl = cl
         cl.delegate = this

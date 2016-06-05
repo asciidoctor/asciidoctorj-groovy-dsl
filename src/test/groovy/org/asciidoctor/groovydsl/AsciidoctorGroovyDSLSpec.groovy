@@ -35,6 +35,8 @@ But this should be uppercase
 [small]
 And THIS should be lowercase\n\
 
+capitalize::tHIS_sets_the_fIRST_letter_in_cApItAlS_and_REMOVES_underscores[]
+
 .Gemfile
 [source,ruby]
 ----
@@ -49,7 +51,7 @@ See man:gittutorial[7] to get started.
 blacklisted is a blacklisted word.
  
 '''
-    
+
     File testRootDir
 
     def setup() {
@@ -87,28 +89,29 @@ blacklisted is a blacklisted word.
         rendered.contains('and this should be lowercase')
         rendered.contains('Ignore this.')
     }
-    
-    
+
+
     def 'Should apply BlockProcessor from Closure'() {
         given:
 
         AsciidoctorExtensions.extensions {
             block(name: 'BIG', contexts: [':paragraph']) {
                 parent, reader, attributes ->
-                def upperLines = reader.readLines()
-                .collect {it.toUpperCase()}
-                .inject('') {a, b -> a + '\n' + b}
+                    def upperLines = reader.readLines()
+                            .collect { it.toUpperCase() }
+                            .inject('') { a, b -> a + '\n' + b }
 
-                createBlock(parent, 'paragraph', [upperLines], attributes, [:])
+                    createBlock(parent, 'paragraph', [upperLines], attributes, [:])
             }
             block('small') {
                 parent, reader, attributes ->
-                def lowerLines = reader.readLines()
-                .collect {it.toLowerCase()}
-                .inject('') {a, b -> a + '\n' + b}
-                
-                createBlock(parent, 'paragraph', [lowerLines], attributes, [:])
+                    def lowerLines = reader.readLines()
+                            .collect { it.toLowerCase() }
+                            .inject('') { a, b -> a + '\n' + b }
+
+                    createBlock(parent, 'paragraph', [lowerLines], attributes, [:])
             }
+
         }
 
         when:
@@ -119,7 +122,7 @@ blacklisted is a blacklisted word.
         rendered.contains('and this should be lowercase')
         rendered.contains('Ignore this.')
     }
-    
+
     def 'Should apply BlockProcessor from Extension file'() {
         given:
 
@@ -167,6 +170,25 @@ blacklisted is a blacklisted word.
         println rendered
     }
 
+    def 'Should apply BlockMacroProcessor from Closure'() {
+        given:
+        AsciidoctorExtensions.extensions {
+            block_macro ("gist") {
+                parent, target, attributes ->
+                    String content = """<div class="content">
+<script src="https://gist.github.com/${target}.js"></script>
+</div>"""
+                    createBlock(parent, "pass", [content], attributes, config);
+            }
+        }
+
+        when:
+        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+
+        then:
+        rendered.contains("https://gist.github.com/123456.js")
+    }
+
     def 'Should apply BlockMacroProcessor from Extension file'() {
         given:
         AsciidoctorExtensions.extensions(new File('src/test/resources/testblockmacroextension.groovy'))
@@ -176,6 +198,24 @@ blacklisted is a blacklisted word.
 
         then:
         rendered.contains("https://gist.github.com/123456.js")
+    }
+
+    def 'Should apply InlineMacroProcessor from Closure'() {
+        given:
+
+        AsciidoctorExtensions.extensions {
+            inline_macro('man') {
+                parent, target, attributes ->
+                    def options = ["type": ":link", "target": target + ".html"]
+                    createInline(parent, "anchor", target, attributes, options).convert()
+            }
+        }
+
+        when:
+        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+
+        then:
+        rendered.contains('<a href="gittutorial.html">gittutorial</a>')
     }
 
     def 'Should apply InlineMacroProcessor from Extension file'() {
@@ -226,5 +266,117 @@ World''',
         rendered ==~ /(?ms).*<head>.*<meta name="hello" content="world">.*<\/head>.*/
     }
 
+    /*
+    * Tests deprecated method, to delete at some point.
+    */
+    def 'Should apply BlockMacroProcessor from Closure with string parameter'() {
+        given:
+
+        AsciidoctorExtensions.extensions {
+            blockmacro('capitalize') {
+                parent, target, attributes ->
+                    def capitalLines = target.toLowerCase()
+                            .tokenize('_')
+                            .collect { it.capitalize() }
+                            .join(' ')
+                    createBlock(parent, 'pass', [capitalLines], attributes, config)
+            }
+        }
+
+        when:
+        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+
+        then:
+        rendered.contains('This Sets The First Letter In Capitals And Removes Underscores')
+        rendered.contains('Ignore this.')
+    }
+
+    /*
+    * Tests deprecated method, to delete at some point.
+    */
+    def 'Should apply BlockMacroProcessor from Closure with named parameter'() {
+        given:
+
+        AsciidoctorExtensions.extensions {
+            blockmacro(name: 'capitalize') {
+                parent, target, attributes ->
+                    def capitalLines = target.toLowerCase()
+                            .tokenize('_')
+                            .collect { it.capitalize() }
+                            .join(' ')
+                    createBlock(parent, 'pass', [capitalLines], attributes, config)
+            }
+        }
+
+        when:
+        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+
+        then:
+        rendered.contains('This Sets The First Letter In Capitals And Removes Underscores')
+        rendered.contains('Ignore this.')
+    }
+
+    /*
+    * Tests deprecated method, to delete at some point.
+    */
+    def 'Should apply InlineMacroProcessor from Closure with named parameter'() {
+        given:
+
+        AsciidoctorExtensions.extensions {
+            inlinemacro(name: 'man') {
+                parent, target, attributes ->
+                    def options = ["type": ":link", "target": target + ".html"]
+                    createInline(parent, "anchor", target, attributes, options).convert()
+            }
+        }
+
+        when:
+        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+
+        then:
+        rendered.contains('<a href="gittutorial.html">gittutorial</a>')
+    }
+
+    /*
+    * Tests deprecated method, to delete at some point.
+    */
+    def 'Should apply InlineMacroProcessor from Closure with string parameter'() {
+        given:
+
+        AsciidoctorExtensions.extensions {
+            inlinemacro('man') {
+                parent, target, attributes ->
+                    def options = ["type": ":link", "target": target + ".html"]
+                    createInline(parent, "anchor", target, attributes, options).convert()
+            }
+        }
+
+        when:
+        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+
+        then:
+        rendered.contains('<a href="gittutorial.html">gittutorial</a>')
+    }
+
+    /*
+    * Tests deprecated method, to delete at some point.
+    */
+    def 'Should apply Includeprocessor from Closure'() {
+        given:
+        AsciidoctorExtensions.extensions {
+            includeprocessor (filter: {it.startsWith("http")}) {
+                document, reader, target, attributes ->
+                    reader.push_include("The content of the URL", target, target, 1, attributes);
+            }
+
+        }
+
+        when:
+        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+
+        then:
+        rendered.contains('The content of the URL')
+        println rendered
+    }
 
 }

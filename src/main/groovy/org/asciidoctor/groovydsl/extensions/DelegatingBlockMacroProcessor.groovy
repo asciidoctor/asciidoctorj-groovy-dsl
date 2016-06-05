@@ -22,7 +22,7 @@ class DelegatingBlockMacroProcessor extends BlockMacroProcessor {
 
     private final Closure cl
 
-    DelegatingBlockMacroProcessor(String name, Map options, Closure cl) {
+    DelegatingBlockMacroProcessor(String name, Map options, @DelegatesTo(BlockMacroProcessor) Closure cl) {
         super(name, options)
         this.cl = cl
         cl.delegate = this
