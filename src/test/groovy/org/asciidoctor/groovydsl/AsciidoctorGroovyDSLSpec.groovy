@@ -59,6 +59,46 @@ blacklisted is a blacklisted word.
     }
 
 
+    def 'Should clear registry on exception when registering from a Closure'() {
+        given:
+        AsciidoctorExtensions.extensions {
+            throw new Exception('This error is on purpose')
+        }
+
+        when:
+        Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+
+        then:
+        def e = thrown(AsciidoctorExtentionException)
+        e.message.contains('Error registering extension from class')
+    }
+
+    def 'Should clear registry on exception when registering from a String'() {
+
+        given:
+        AsciidoctorExtensions.extensions 'throw new Exception(\'This error is on purpose\')'
+
+        when:
+        Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+
+        then:
+        def e = thrown(AsciidoctorExtentionException)
+        e.message.contains('Error registering extension from string')
+    }
+
+    def 'Should clear registry on exception when registering from a File'() {
+        given:
+        AsciidoctorExtensions.extensions(new File('src/test/resources/error.groovy'))
+
+        when:
+        Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+
+        then:
+        def e = thrown(AsciidoctorExtentionException)
+        e.message.contains('Error registering extension from file')
+    }
+
+
     def 'Should apply BlockProcessor from Script as String'() {
         given:
 
