@@ -23,7 +23,7 @@ class DelegatingPreprocessor extends Preprocessor {
 
     private final Closure cl
 
-    DelegatingPreprocessor(Map options, Closure cl) {
+    DelegatingPreprocessor(Map options, @DelegatesTo(Preprocessor) Closure cl) {
         super(options)
         this.cl = cl
         cl.delegate = this

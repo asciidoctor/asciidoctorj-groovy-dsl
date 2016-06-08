@@ -32,7 +32,7 @@ class AsciidoctorExtensions {
     // is asked to register its extensions
     static final List<Object> REGISTERED_EXTENSIONS = []
 
-    static void extensions(Closure cl) {
+    static void extensions(@DelegatesTo(AsciidoctorExtensionHandler) Closure cl) {
         REGISTERED_EXTENSIONS << cl
     }
 

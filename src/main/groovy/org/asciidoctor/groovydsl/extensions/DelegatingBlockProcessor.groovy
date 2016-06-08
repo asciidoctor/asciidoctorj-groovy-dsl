@@ -20,12 +20,11 @@ import org.asciidoctor.extension.BlockProcessor
 import org.asciidoctor.extension.Reader
 import org.asciidoctor.groovydsl.AsciidoctorExtensionHandler
 
-
 class DelegatingBlockProcessor extends BlockProcessor {
 
     Closure cl
-    
-    DelegatingBlockProcessor(Map<String, Object> attributes, Closure cl) {
+
+    DelegatingBlockProcessor(Map<String, Object> attributes, @DelegatesTo(BlockProcessor) Closure cl) {
         super(attributes[AsciidoctorExtensionHandler.OPTION_NAME], attributes)
         this.cl = cl
         cl.delegate = this

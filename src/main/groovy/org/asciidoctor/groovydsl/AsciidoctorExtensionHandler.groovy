@@ -15,6 +15,14 @@
  */
 package org.asciidoctor.groovydsl
 
+import org.asciidoctor.extension.BlockMacroProcessor
+import org.asciidoctor.extension.BlockProcessor
+import org.asciidoctor.extension.DocinfoProcessor
+import org.asciidoctor.extension.IncludeProcessor
+import org.asciidoctor.extension.InlineMacroProcessor
+import org.asciidoctor.extension.Postprocessor
+import org.asciidoctor.extension.Preprocessor
+import org.asciidoctor.extension.Treeprocessor
 import org.asciidoctor.groovydsl.extensions.DelegatingBlockMacroProcessor
 import org.asciidoctor.groovydsl.extensions.DelegatingBlockProcessor
 import org.asciidoctor.groovydsl.extensions.DelegatingDocinfoProcessor
@@ -34,16 +42,16 @@ class AsciidoctorExtensionHandler {
     private static final String OPTION_CONTEXTS = 'contexts'
 
     private final Asciidoctor asciidoctor
-    
+
     AsciidoctorExtensionHandler(Asciidoctor asciidoctor) {
         this.asciidoctor = asciidoctor
     }
-    
-    void block(String blockName, Closure cl) {
+
+    void block(String blockName, @DelegatesTo(BlockProcessor) Closure cl) {
         block([(OPTION_NAME): blockName], cl)
     }
 
-    void block(Map options=[:], Closure cl) {
+    void block(Map options=[:], @DelegatesTo(BlockProcessor) Closure cl) {
         if (!options.containsKey(OPTION_NAME)) {
             throw new IllegalArgumentException('Block must define a name!')
         }
@@ -54,37 +62,37 @@ class AsciidoctorExtensionHandler {
         asciidoctor.javaExtensionRegistry().block(new DelegatingBlockProcessor(options, cl))
     }
 
-    void block_macro(Map options, Closure cl) {
+    void block_macro(Map options, @DelegatesTo(BlockMacroProcessor) Closure cl) {
         asciidoctor.javaExtensionRegistry().blockMacro(new DelegatingBlockMacroProcessor(options[OPTION_NAME], options, cl))
     }
 
-    void block_macro(String name, Closure cl) {
-        blockMacro([OPTION_NAME: name], cl)
+    void block_macro(String name, @DelegatesTo(BlockMacroProcessor) Closure cl) {
+        block_macro([(OPTION_NAME): name], cl)
     }
 
     /**
      * @deprecated Please use {@link #block_macro(java.util.Map, groovy.lang.Closure)} instead
      */
-    void blockmacro(Map options, Closure cl) {
-        asciidoctor.javaExtensionRegistry().blockMacro(new DelegatingBlockMacroProcessor(options[OPTION_NAME], options, cl))
+    void blockmacro(Map options, @DelegatesTo(BlockMacroProcessor) Closure cl) {
+        block_macro(options, cl)
     }
 
     /**
      * @deprecated Please use {@link #block_macro(java.lang.String, groovy.lang.Closure)} instead
      */
-    void blockmacro(String name, Closure cl) {
-        blockMacro([OPTION_NAME: name], cl)
+    void blockmacro(String name, @DelegatesTo(BlockMacroProcessor) Closure cl) {
+        block_macro([(OPTION_NAME): name], cl)
     }
 
-    void postprocessor(Map options=[:], Closure cl) {
+    void postprocessor(Map options=[:], @DelegatesTo(Postprocessor) Closure cl) {
         asciidoctor.javaExtensionRegistry().postprocessor(new DelegatingPostprocessor(options, cl))
     }
 
-    void preprocessor(Map options=[:], Closure cl) {
+    void preprocessor(Map options=[:], @DelegatesTo(Preprocessor) Closure cl) {
         asciidoctor.javaExtensionRegistry().preprocessor(new DelegatingPreprocessor(options, cl))
     }
 
-    void include_processor(Map options=[:], Closure cl) {
+    void include_processor(Map options=[:], @DelegatesTo(IncludeProcessor) Closure cl) {
         Closure filter = options[OPTION_FILTER]
         Map optionsWithoutFilter = options - options.subMap([OPTION_FILTER])
         asciidoctor.javaExtensionRegistry().includeProcessor(new DelegatingIncludeProcessor(optionsWithoutFilter, filter, cl))
@@ -93,39 +101,39 @@ class AsciidoctorExtensionHandler {
     /**
      * @deprecated Please use {@link #include_processor(java.util.Map, groovy.lang.Closure)} instead
      */
-    void includeprocessor(Map options=[:], Closure cl) {
-        Closure filter = options[OPTION_FILTER]
+    void includeprocessor(Map options=[:], @DelegatesTo(IncludeProcessor) Closure cl) {
+        Closure filter = options[(OPTION_FILTER)]
         Map optionsWithoutFilter = options - options.subMap([OPTION_FILTER])
         asciidoctor.javaExtensionRegistry().includeProcessor(new DelegatingIncludeProcessor(optionsWithoutFilter, filter, cl))
     }
 
-    void inline_macro(Map options, Closure cl) {
+    void inline_macro(Map options, @DelegatesTo(InlineMacroProcessor) Closure cl) {
         asciidoctor.javaExtensionRegistry().inlineMacro(new DelegatingInlineMacroProcessor(options[OPTION_NAME], options, cl))
     }
 
-    void inline_macro(String macroName, Closure cl) {
-        inlineMacro([OPTION_NAME: macroName], closure: cl)
+    void inline_macro(String macroName, @DelegatesTo(InlineMacroProcessor) Closure cl) {
+        inline_macro([(OPTION_NAME): macroName], cl)
     }
 
     /**
      * @deprecated Please use {@link #inline_macro(java.util.Map, groovy.lang.Closure)} instead
      */
-    void inlinemacro(Map options, Closure cl) {
+    void inlinemacro(Map options, @DelegatesTo(InlineMacroProcessor) Closure cl) {
         asciidoctor.javaExtensionRegistry().inlineMacro(new DelegatingInlineMacroProcessor(options[OPTION_NAME], options, cl))
     }
 
     /**
      * @deprecated Please use {@link #inline_macro(java.lang.String, groovy.lang.Closure)} instead
      */
-    void inlinemacro(String macroName, Closure cl) {
-        inlineMacro([OPTION_NAME: macroName], closure: cl)
+    void inlinemacro(String macroName, @DelegatesTo(InlineMacroProcessor) Closure cl) {
+        inline_macro([(OPTION_NAME): macroName], cl)
     }
 
-    void treeprocessor(Map options=[:], Closure cl) {
+    void treeprocessor(Map options=[:], @DelegatesTo(Treeprocessor) Closure cl) {
         asciidoctor.javaExtensionRegistry().treeprocessor(new DelegatingTreeprocessor(options, cl))
     }
 
-    void docinfo_processor(Map options=[:], Closure cl) {
+    void docinfo_processor(Map options=[:], @DelegatesTo(DocinfoProcessor) Closure cl) {
         asciidoctor.javaExtensionRegistry().docinfoProcessor(new DelegatingDocinfoProcessor(options, cl))
     }
 

@@ -22,7 +22,7 @@ class DelegatingInlineMacroProcessor extends InlineMacroProcessor {
 
     private final Closure cl
 
-    DelegatingInlineMacroProcessor(String name, Map options, Closure cl) {
+    DelegatingInlineMacroProcessor(String name, Map options, @DelegatesTo(InlineMacroProcessor) Closure cl) {
         super(name, options)
         this.cl = cl
         cl.delegate = this
