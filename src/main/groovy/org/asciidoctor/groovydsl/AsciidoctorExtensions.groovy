@@ -55,7 +55,7 @@ class AsciidoctorExtensions {
                         it.call()
                     } catch (e) {
                         REGISTERED_EXTENSIONS.clear()
-                        throw new AsciidoctorExtentionException("Error registering extension from class in ${it.class.name}", e)
+                        throw new AsciidoctorExtensionException("Error registering extension from class in ${it.class.name}", e)
                     }
                     break
                 case String:
@@ -66,7 +66,7 @@ class AsciidoctorExtensions {
                         script.run()
                     } catch (e) {
                         REGISTERED_EXTENSIONS.clear()
-                        throw new AsciidoctorExtentionException("Error registering extension from string", e)
+                        throw new AsciidoctorExtensionException('Error registering extension from string', e)
                     }
                     break
                 case File:
@@ -78,7 +78,7 @@ class AsciidoctorExtensions {
                         script.run()
                     } catch (e) {
                         REGISTERED_EXTENSIONS.clear()
-                        throw new AsciidoctorExtentionException("Error registering extension from file ${it.name}", e)
+                        throw new AsciidoctorExtensionException("Error registering extension from file ${it.name}", e)
                     } finally {
                         reader.close()
                     }

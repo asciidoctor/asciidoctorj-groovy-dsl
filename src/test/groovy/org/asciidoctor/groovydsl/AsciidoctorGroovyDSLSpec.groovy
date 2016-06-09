@@ -69,7 +69,7 @@ blacklisted is a blacklisted word.
         Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
 
         then:
-        def e = thrown(AsciidoctorExtentionException)
+        def e = thrown(AsciidoctorExtensionException)
         e.message.contains('Error registering extension from class')
     }
 
@@ -82,7 +82,7 @@ blacklisted is a blacklisted word.
         Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
 
         then:
-        def e = thrown(AsciidoctorExtentionException)
+        def e = thrown(AsciidoctorExtensionException)
         e.message.contains('Error registering extension from string')
     }
 
@@ -94,7 +94,7 @@ blacklisted is a blacklisted word.
         Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
 
         then:
-        def e = thrown(AsciidoctorExtentionException)
+        def e = thrown(AsciidoctorExtensionException)
         e.message.contains('Error registering extension from file')
     }
 
