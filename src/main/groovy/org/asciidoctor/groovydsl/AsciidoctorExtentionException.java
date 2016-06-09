@@ -1,13 +1,10 @@
 package org.asciidoctor.groovydsl;
 
-import groovy.transform.InheritConstructors;
 
 /**
  * Generic exception to manage Asciidoctor Extension DSL processing errors
  */
-@InheritConstructors
 public class AsciidoctorExtentionException extends Exception {
-
 
     public AsciidoctorExtentionException() {
     }
