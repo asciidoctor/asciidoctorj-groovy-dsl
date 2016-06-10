@@ -46,26 +46,39 @@ class AsciidoctorExtensions {
 
     static void registerTo(Asciidoctor asciidoctor) {
         AsciidoctorExtensionHandler extensionHandler = new AsciidoctorExtensionHandler(asciidoctor)
-        REGISTERED_EXTENSIONS.each {
+        for (def it : REGISTERED_EXTENSIONS) {
             DelegatingScript script
             switch (it) {
                 case Closure:
-                    it.delegate = extensionHandler
-                    it.call()
+                    try {
+                        it.delegate = extensionHandler
+                        it.call()
+                    } catch (e) {
+                        REGISTERED_EXTENSIONS.clear()
+                        throw new AsciidoctorExtensionException("Error registering extension from class in ${it.class.name}", e)
+                    }
                     break
                 case String:
                     def shell = makeGroovyShell()
                     script = shell.parse(it)
                     script.setDelegate(extensionHandler)
-                    script.run()
+                    try {
+                        script.run()
+                    } catch (e) {
+                        REGISTERED_EXTENSIONS.clear()
+                        throw new AsciidoctorExtensionException('Error registering extension from string', e)
+                    }
                     break
                 case File:
                     def shell = makeGroovyShell()
                     FileReader reader = new FileReader(it)
+                    script = shell.parse(reader, it.name)
+                    script.setDelegate(extensionHandler)
                     try {
-                        script = shell.parse(reader, it.name)
-                        script.setDelegate(extensionHandler)
                         script.run()
+                    } catch (e) {
+                        REGISTERED_EXTENSIONS.clear()
+                        throw new AsciidoctorExtensionException("Error registering extension from file ${it.name}", e)
                     } finally {
                         reader.close()
                     }
@@ -88,7 +101,7 @@ class AsciidoctorExtensions {
 
         config.addCompilationCustomizers(
                 importCustomizer
-                )
+        )
 
         new GroovyShell(new Binding(), config)
     }
