@@ -30,7 +30,7 @@ class DelegatingTreeprocessor extends Treeprocessor {
 
     Document process(Document document) {
         def ret = cl.call(document)
-        if (!(ret instanceof Document)) {
+        if (!(ret in Document)) {
             // Assume that the closure does something as last
             // statement that was not intended to be the return value
             // -> Return null

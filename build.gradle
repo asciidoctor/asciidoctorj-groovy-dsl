@@ -3,9 +3,10 @@ buildscript {
          mavenLocal()
          jcenter()
      }
-     dependencies {
-         classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5"
-     }
+}
+
+plugins {
+    id "com.jfrog.bintray" version "1.6"
 }
 
 apply plugin: 'groovy'
@@ -52,6 +53,6 @@ artifacts {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.3'
+    gradleVersion = '2.14'
 }
 

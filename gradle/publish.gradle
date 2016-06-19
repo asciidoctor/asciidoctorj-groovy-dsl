@@ -114,6 +114,9 @@ if (!project.hasProperty('bintrayApiKey')) ext.bintrayApiKey = ''
 bintray {
     user = project.bintrayUsername
     key = project.bintrayApiKey
+
+    dryRun = project.hasProperty('dryRun') && project.dryRun.toBoolean()
+
     publications = ['mavenCustom']
     pkg {
         repo = 'maven'
