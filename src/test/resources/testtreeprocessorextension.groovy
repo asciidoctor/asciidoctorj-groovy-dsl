@@ -1,7 +1,7 @@
 treeprocessor {
     document ->
-    List blocks = document.blocks()
-    (0..<blocks.length).each {
+    def blocks = document.blocks()
+    (0..<blocks.size()).each {
         def block = blocks[it]
         def lines = block.lines()
         if (lines.size() > 0 && lines[0].startsWith('$')) {
