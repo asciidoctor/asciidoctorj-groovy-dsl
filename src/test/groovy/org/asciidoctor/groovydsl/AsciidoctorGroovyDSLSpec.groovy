@@ -218,7 +218,7 @@ blacklisted is a blacklisted word.
                     String content = """<div class="content">
 <script src="https://gist.github.com/${target}.js"></script>
 </div>"""
-                    createBlock(parent, "pass", [content], attributes, config);
+                    createBlock(parent, "pass", [content], attributes)
             }
         }
 
@@ -247,7 +247,7 @@ blacklisted is a blacklisted word.
             inline_macro('man') {
                 parent, target, attributes ->
                     def options = ["type": ":link", "target": target + ".html"]
-                    createInline(parent, "anchor", target, attributes, options).convert()
+                    createPhraseNode(parent, "anchor", target, attributes, options).convert()
             }
         }
 
@@ -319,7 +319,7 @@ World''',
                             .tokenize('_')
                             .collect { it.capitalize() }
                             .join(' ')
-                    createBlock(parent, 'pass', [capitalLines], attributes, config)
+                    createBlock(parent, 'pass', [capitalLines], attributes)
             }
         }
 
@@ -344,7 +344,7 @@ World''',
                             .tokenize('_')
                             .collect { it.capitalize() }
                             .join(' ')
-                    createBlock(parent, 'pass', [capitalLines], attributes, config)
+                    createBlock(parent, 'pass', [capitalLines], attributes)
             }
         }
 
@@ -366,7 +366,7 @@ World''',
             inlinemacro(name: 'man') {
                 parent, target, attributes ->
                     def options = ["type": ":link", "target": target + ".html"]
-                    createInline(parent, "anchor", target, attributes, options).convert()
+                    createPhraseNode(parent, "anchor", target, attributes, options).convert()
             }
         }
 
@@ -387,7 +387,7 @@ World''',
             inlinemacro('man') {
                 parent, target, attributes ->
                     def options = ["type": ":link", "target": target + ".html"]
-                    createInline(parent, "anchor", target, attributes, options).convert()
+                    createPhraseNode(parent, "anchor", target, attributes, options).convert()
             }
         }
 

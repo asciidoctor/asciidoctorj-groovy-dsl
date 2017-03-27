@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.3.9'
-    compile 'org.asciidoctor:asciidoctorj:1.5.5'
+    compile 'org.asciidoctor:asciidoctorj:1.6.0-alpha.3'
 
     testCompile('org.spockframework:spock-core:1.0-groovy-2.3') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
@@ -53,6 +53,6 @@ artifacts {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.14'
+    gradleVersion = '2.14.1'
 }
 

@@ -29,7 +29,7 @@ class DelegatingPreprocessor extends Preprocessor {
         cl.delegate = this
     }
 
-    PreprocessorReader process(Document document, PreprocessorReader reader) {
+    void process(Document document, PreprocessorReader reader) {
         cl.call(document, reader)
     }
 	
