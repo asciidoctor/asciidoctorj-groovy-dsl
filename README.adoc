@@ -328,3 +328,12 @@ docinfo_processor {
     document -> '<meta name="robots" content="index,follow">'
 }
 ----
+
+To add content in the footer of the document pass the location option like this:
+
+[source,groovy]
+----
+docinfo_processor( location : ':footer') {
+    document -> '<div>FOOBAR</div>'
+}
+----
