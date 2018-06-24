@@ -8,7 +8,7 @@ treeprocessor {
             Map attributes = block.attributes
             attributes["role"] = "terminal"
             def resultLines = lines.collect {
-                it.startsWith('$') ? "<span class=\"command\">${it.substring(2)}</span>" : it
+                it.startsWith('$') ? "<span class=\"command\">${it.substring(2)}</span>".toString() : it
             }
             blocks[it] = createBlock(document, "listing", resultLines, attributes,[:])
         }
