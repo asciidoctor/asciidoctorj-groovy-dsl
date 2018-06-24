@@ -15,9 +15,13 @@
  */
 package org.asciidoctor.groovydsl
 
+import groovy.transform.CompileStatic
 import org.asciidoctor.Asciidoctor
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
+
+import java.nio.file.Files
+import java.nio.file.Path
 
 /**
  * An instance of this class holds all extension closure and scripts.
@@ -25,84 +29,163 @@ import org.codehaus.groovy.control.customizers.ImportCustomizer
  * to the GroovyExtensionRegistry which is service implementation
  * of org.asciidoctor.extension.spi.wExtensionRegistry
  */
+@CompileStatic
 class AsciidoctorExtensions {
 
-    // Container closures and scripts
-    // These get evaluated when the ExtensionRegistry
-    // is asked to register its extensions
-    static final List<Object> REGISTERED_EXTENSIONS = []
-
-    static void extensions(@DelegatesTo(AsciidoctorExtensionHandler) Closure cl) {
-        REGISTERED_EXTENSIONS << cl
+    /** Add an extension from a closure
+     *
+     * @param cl Closure containing an extension
+     */
+    void addExtension(@DelegatesTo(AsciidoctorExtensionHandler) Closure cl) {
+        registeredExtensions.add(cl)
     }
 
-    static void extensions(String s) {
-        REGISTERED_EXTENSIONS << s
+    /** Add an extension via a string.
+     *
+     * @param groovyScript String containing extension.
+     */
+    void addExtension(final String groovyScript) {
+        registeredExtensions.add(groovyScript)
     }
 
-    static void extensions(File f) {
-        REGISTERED_EXTENSIONS << f
+    /** Add an extension via a file.
+     *
+     * @param groovyScript File containing extension
+     */
+    void addExtension(final File groovyScript) {
+        registeredExtensions.add(groovyScript)
     }
 
-    static void registerTo(Asciidoctor asciidoctor) {
+    /** Add an extension via a path instance
+     *
+     * @param groovyScript Path pointing to an extension
+     */
+    void addExtension(final Path groovyScript) {
+        registeredExtensions.add(groovyScript)
+    }
+
+    /** Remove all extensions.
+     *
+     */
+    void clearExtensions() {
+        registeredExtensions.clear()
+    }
+
+    /** Register all extension with an instance of Asciidoctor.
+     *
+     * @param asciidoctor Asciidoctor instance awaiting extensions.
+     * @throw AsciidoctorExtensionException
+     */
+    @SuppressWarnings('UnnecessarySetter')
+    void registerExtensionsWith(Asciidoctor asciidoctor) {
         AsciidoctorExtensionHandler extensionHandler = new AsciidoctorExtensionHandler(asciidoctor)
-        for (def it : REGISTERED_EXTENSIONS) {
-            DelegatingScript script
+        for (def it : registeredExtensions) {
             switch (it) {
                 case Closure:
                     try {
-                        it.delegate = extensionHandler
-                        it.call()
+                        ((Closure) it).delegate = extensionHandler
+                        ((Closure) it).call()
                     } catch (e) {
-                        REGISTERED_EXTENSIONS.clear()
                         throw new AsciidoctorExtensionException("Error registering extension from class in ${it.class.name}", e)
                     }
                     break
                 case String:
-                    def shell = makeGroovyShell()
-                    script = shell.parse(it)
+                    GroovyShell shell = makeGroovyShell()
+                    DelegatingScript script = (DelegatingScript) shell.parse((String) it)
                     script.setDelegate(extensionHandler)
                     try {
                         script.run()
                     } catch (e) {
-                        REGISTERED_EXTENSIONS.clear()
+                        registeredExtensions.clear()
                         throw new AsciidoctorExtensionException('Error registering extension from string', e)
                     }
                     break
                 case File:
-                    def shell = makeGroovyShell()
-                    FileReader reader = new FileReader(it)
-                    script = shell.parse(reader, it.name)
-                    script.setDelegate(extensionHandler)
-                    try {
-                        script.run()
-                    } catch (e) {
-                        REGISTERED_EXTENSIONS.clear()
-                        throw new AsciidoctorExtensionException("Error registering extension from file ${it.name}", e)
-                    } finally {
-                        reader.close()
+                    File file = (File) it
+                    GroovyShell shell = makeGroovyShell()
+                    file.withReader { reader ->
+                        DelegatingScript script = (DelegatingScript) shell.parse(reader, file.name)
+                        script.setDelegate(extensionHandler)
+                        try {
+                            script.run()
+                        } catch (e) {
+                            throw new AsciidoctorExtensionException("Error registering extension from file ${file.name}", e)
+                        }
+                    }
+                    break
+                case Path:
+                    Path path = (Path) it
+                    GroovyShell shell = makeGroovyShell()
+                    Files.newBufferedReader(path).withReader { reader ->
+                        DelegatingScript script = (DelegatingScript) shell.parse(reader, path.toString())
+                        script.setDelegate(extensionHandler)
+                        try {
+                            script.run()
+                        } catch (e) {
+                            throw new AsciidoctorExtensionException("Error registering extension from file ${path}", e)
+                        }
                     }
                     break
             }
         }
-        REGISTERED_EXTENSIONS.clear()
+    }
+
+    /** Adds an extension to the AsciidoctorExtension singleton instance.
+     *
+     * @param cl Closure containing an instance
+     */
+    static void extensions(@DelegatesTo(AsciidoctorExtensionHandler) Closure cl) {
+        INSTANCE.addExtension(cl)
+    }
+
+    /** Adds an extension to the AsciidoctorExtension singleton instance.
+     *
+     * @param s String containing an instance
+     */
+    static void extensions(String s) {
+        INSTANCE.addExtension(s)
+    }
+
+    /** Adds an extension to the AsciidoctorExtension singleton instance.
+     *
+     * @param f File containing an instance
+     */
+    static void extensions(File f) {
+        INSTANCE.addExtension(f)
+    }
+
+    /** Attempt to register all exteniosn with ASciidoctor instance.
+     *
+     * This method has the side-effect of removing all extensions as well.
+     *
+     * @param asciidoctor
+     */
+    static void registerTo(Asciidoctor asciidoctor) {
+        try {
+            INSTANCE.registerExtensionsWith(asciidoctor)
+        } finally {
+            INSTANCE.clearExtensions()
+        }
     }
 
     private static GroovyShell makeGroovyShell() {
         def config = new CompilerConfiguration()
 
-        config.setScriptBaseClass(DelegatingScript.name)
+        config.scriptBaseClass = DelegatingScript.name
 
         ImportCustomizer importCustomizer = new ImportCustomizer()
         importCustomizer.addStarImports(
-                'org.asciidoctor',
-                'org.asciidoctor.ast',
-                'org.asciidoctor.extension')
+            'org.asciidoctor',
+            'org.asciidoctor.ast',
+            'org.asciidoctor.extension')
 
         config.addCompilationCustomizers(
-                importCustomizer
+            importCustomizer
         )
 
         new GroovyShell(new Binding(), config)
     }
+
+    private final List<Object> registeredExtensions = []
+    private static final AsciidoctorExtensions INSTANCE = new AsciidoctorExtensions()
 }
