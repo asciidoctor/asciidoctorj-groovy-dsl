@@ -24,7 +24,7 @@ Then execute this code:
 [source,groovy]
 ----
 @GrabConfig(systemClassLoader=true)
-@Grab(group='org.asciidoctor', module='asciidoctorj-groovy-dsl', version='1.0.0.Alpha.2') // <1>
+@Grab(group='org.asciidoctor', module='asciidoctorj-groovy-dsl', version='1.6.0-alpha.1') // <1>
 import org.asciidoctor.groovydsl.AsciidoctorExtensions
 import org.asciidoctor.Asciidoctor
 
