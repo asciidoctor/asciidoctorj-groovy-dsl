@@ -28,7 +28,7 @@ repositories {
 
 dependencies {
     compile "org.codehaus.groovy:groovy:${groovyVer}"
-    compile 'org.asciidoctor:asciidoctorj:1.6.0'
+    compile 'org.asciidoctor:asciidoctorj:1.6.2'
 
     testCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
