@@ -66,11 +66,13 @@ blacklisted is a blacklisted word.
         }
 
         when:
-        Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
-        def e = thrown(AsciidoctorExtensionException)
-        e.message.contains('Error registering extension from class')
+        def e = thrown(ServiceConfigurationError)
+        e.message.contains('Provider org.asciidoctor.jruby.internal.JRubyAsciidoctor could not be instantiated')
+        e.cause.message.contains('Error registering extension from class')
+        e.cause.cause.message.contains('This error is on purpose')
     }
 
     def 'Should clear registry on exception when registering from a String'() {
@@ -79,11 +81,13 @@ blacklisted is a blacklisted word.
         AsciidoctorExtensions.extensions 'throw new Exception(\'This error is on purpose\')'
 
         when:
-        Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
-        def e = thrown(AsciidoctorExtensionException)
-        e.message.contains('Error registering extension from string')
+        def e = thrown(ServiceConfigurationError)
+        e.message.contains('Provider org.asciidoctor.jruby.internal.JRubyAsciidoctor could not be instantiated')
+        e.cause.message.contains('Error registering extension from string')
+        e.cause.cause.message.contains('This error is on purpose')
     }
 
     def 'Should clear registry on exception when registering from a File'() {
@@ -91,13 +95,14 @@ blacklisted is a blacklisted word.
         AsciidoctorExtensions.extensions(new File('src/test/resources/error.groovy'))
 
         when:
-        Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
-        def e = thrown(AsciidoctorExtensionException)
-        e.message.contains('Error registering extension from file')
+        def e = thrown(ServiceConfigurationError)
+        e.message.contains('Provider org.asciidoctor.jruby.internal.JRubyAsciidoctor could not be instantiated')
+        e.cause.message.contains('Error registering extension from file')
+        e.cause.cause.message.contains('This error is on purpose')
     }
-
 
     def 'Should apply BlockProcessor from Script as String'() {
         given:
@@ -122,7 +127,7 @@ blacklisted is a blacklisted word.
         
 '''
         when:
-        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
         rendered.contains('BUT THIS SHOULD BE UPPERCASE')
@@ -155,7 +160,7 @@ blacklisted is a blacklisted word.
         }
 
         when:
-        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
         rendered.contains('BUT THIS SHOULD BE UPPERCASE')
@@ -168,7 +173,7 @@ blacklisted is a blacklisted word.
 
         AsciidoctorExtensions.extensions(new File('src/test/resources/testblockextensions.groovy'))
         when:
-        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
         rendered.contains('BUT THIS SHOULD BE UPPERCASE')
@@ -181,7 +186,7 @@ blacklisted is a blacklisted word.
         AsciidoctorExtensions.extensions(new File('src/test/resources/testpostprocessorextension.groovy'))
 
         when:
-        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
         rendered.contains('Copyright Acme, Inc.')
@@ -192,7 +197,7 @@ blacklisted is a blacklisted word.
         AsciidoctorExtensions.extensions(new File('src/test/resources/testpreprocessorextension.groovy'))
 
         when:
-        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
         !rendered.contains('Ignore this.')
@@ -203,7 +208,7 @@ blacklisted is a blacklisted word.
         AsciidoctorExtensions.extensions(new File('src/test/resources/testincludeprocessorextension.groovy'))
 
         when:
-        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
         rendered.contains('The content of the URL')
@@ -223,7 +228,7 @@ blacklisted is a blacklisted word.
         }
 
         when:
-        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
         rendered.contains("https://gist.github.com/123456.js")
@@ -234,7 +239,7 @@ blacklisted is a blacklisted word.
         AsciidoctorExtensions.extensions(new File('src/test/resources/testblockmacroextension.groovy'))
 
         when:
-        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
         rendered.contains("https://gist.github.com/123456.js")
@@ -252,7 +257,7 @@ blacklisted is a blacklisted word.
         }
 
         when:
-        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
         rendered.contains('<a href="gittutorial.html">gittutorial</a>')
@@ -263,10 +268,42 @@ blacklisted is a blacklisted word.
         AsciidoctorExtensions.extensions(new File('src/test/resources/testinlinemacroprocessorextension.groovy'))
 
         when:
-        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
         rendered.contains('<a href="gittutorial.html">gittutorial</a>')
+    }
+
+    def 'Should apply Treeprocessor from Closure'() {
+        given:
+        AsciidoctorExtensions.extensions {
+            treeprocessor {
+                document ->
+                    def blocks = document.blocks()
+                    blocks.eachWithIndex { block, i ->
+                        def lines = block.lines()
+                        if (lines.size() > 0 && lines[0].startsWith('$')) {
+                            Map attributes = block.attributes
+                            attributes["role"] = "terminal"
+                            def resultLines = lines.collect {
+                                it.startsWith('$') ? "<span class=\"command\">${it.substring(2)}</span>".toString() : it
+                            }
+                            blocks[i] = createBlock(document, "listing", resultLines, attributes,[:])
+                        }
+                    }
+            }
+        }
+
+        when:
+        String rendered = Asciidoctor.Factory.create().convert('''
+$ echo "Hello, World!"
+
+$ gem install asciidoctor
+''', [:])
+
+        then:
+        rendered.contains('<div class="listingblock terminal">')
+        rendered.contains('<span class="command">gem install asciidoctor</span>')
     }
 
     def 'Should apply Treeprocessor from Extension file'() {
@@ -274,13 +311,14 @@ blacklisted is a blacklisted word.
         AsciidoctorExtensions.extensions(new File('src/test/resources/testtreeprocessorextension.groovy'))
 
         when:
-        String rendered = Asciidoctor.Factory.create().render('''
+        String rendered = Asciidoctor.Factory.create().convert('''
 $ echo "Hello, World!"
 
 $ gem install asciidoctor
 ''', [:])
 
         then:
+        rendered.contains('<div class="listingblock terminal">')
         rendered.contains('<span class="command">gem install asciidoctor</span>')
     }
 
@@ -294,7 +332,7 @@ $ gem install asciidoctor
         }
 
         when:
-        String rendered = Asciidoctor.Factory.create().render(
+        String rendered = Asciidoctor.Factory.create().convert(
                 '''
 = Hello
 
@@ -313,7 +351,7 @@ World''',
         given:
 
         AsciidoctorExtensions.extensions {
-            blockmacro('capitalize') {
+            block_macro('capitalize') {
                 parent, target, attributes ->
                     def capitalLines = target.toLowerCase()
                             .tokenize('_')
@@ -324,7 +362,7 @@ World''',
         }
 
         when:
-        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
         rendered.contains('This Sets The First Letter In Capitals And Removes Underscores')
@@ -338,7 +376,7 @@ World''',
         given:
 
         AsciidoctorExtensions.extensions {
-            blockmacro(name: 'capitalize') {
+            block_macro(name: 'capitalize') {
                 parent, target, attributes ->
                     def capitalLines = target.toLowerCase()
                             .tokenize('_')
@@ -349,7 +387,7 @@ World''',
         }
 
         when:
-        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
         rendered.contains('This Sets The First Letter In Capitals And Removes Underscores')
@@ -363,7 +401,7 @@ World''',
         given:
 
         AsciidoctorExtensions.extensions {
-            inlinemacro(name: 'man') {
+            inline_macro(name: 'man') {
                 parent, target, attributes ->
                     def options = ["type": ":link", "target": target + ".html"]
                     createPhraseNode(parent, "anchor", target, attributes, options).convert()
@@ -371,7 +409,7 @@ World''',
         }
 
         when:
-        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
         rendered.contains('<a href="gittutorial.html">gittutorial</a>')
@@ -384,7 +422,7 @@ World''',
         given:
 
         AsciidoctorExtensions.extensions {
-            inlinemacro('man') {
+            inline_macro('man') {
                 parent, target, attributes ->
                     def options = ["type": ":link", "target": target + ".html"]
                     createPhraseNode(parent, "anchor", target, attributes, options).convert()
@@ -392,7 +430,7 @@ World''',
         }
 
         when:
-        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
         rendered.contains('<a href="gittutorial.html">gittutorial</a>')
@@ -404,15 +442,14 @@ World''',
     def 'Should apply Includeprocessor from Closure'() {
         given:
         AsciidoctorExtensions.extensions {
-            includeprocessor (filter: {it.startsWith("http")}) {
+            include_processor (filter: {it.startsWith("http")}) {
                 document, reader, target, attributes ->
                     reader.push_include("The content of the URL", target, target, 1, attributes);
             }
-
         }
 
         when:
-        String rendered = Asciidoctor.Factory.create().render(TEST_DOC_BLOCK, [:])
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
         then:
         rendered.contains('The content of the URL')

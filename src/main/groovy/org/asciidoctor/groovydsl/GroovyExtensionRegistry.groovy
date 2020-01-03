@@ -16,9 +16,10 @@
 package org.asciidoctor.groovydsl
 
 import org.asciidoctor.Asciidoctor
-import org.asciidoctor.extension.spi.ExtensionRegistry
+import org.asciidoctor.jruby.extension.spi.ExtensionRegistry
+
 /**
- * The service implementation for org.asciidoctor.extension.spi.ExtensionRegistry.
+ * The service implementation for org.asciidoctor.jruby.extension.spi.ExtensionRegistry.
  * It simply delegates the register() call to {@link AsciidoctorExtensions} 
  * that owns all configured extensions and registers it on the Asciidoctor instance.
  */

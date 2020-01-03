@@ -215,7 +215,7 @@ It also requires the `name` option or the name given as the only additional para
 inline_macro (name: "man") {
     parent, target, attributes ->
     options=["type": ":link", "target": target + ".html"]
-    createInline(parent, "anchor", target, attributes, options).render()
+    createPhraseNode(parent, "anchor", target, attributes, options).render()
 }
 ----
 
@@ -333,7 +333,7 @@ To add content in the footer of the document pass the location option like this:
 
 [source,groovy]
 ----
-docinfo_processor( location : ':footer') {
+docinfo_processor (location : ':footer') {
     document -> '<div>FOOBAR</div>'
 }
 ----
