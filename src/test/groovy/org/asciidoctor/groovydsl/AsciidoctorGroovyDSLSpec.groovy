@@ -17,6 +17,7 @@ package org.asciidoctor.groovydsl
 
 import org.asciidoctor.Asciidoctor
 import org.asciidoctor.SafeMode
+import org.jsoup.Jsoup
 import spock.lang.Specification
 
 import static org.asciidoctor.OptionsBuilder.options
@@ -170,8 +171,8 @@ blacklisted is a blacklisted word.
 
     def 'Should apply BlockProcessor from Extension file'() {
         given:
-
         AsciidoctorExtensions.extensions(new File('src/test/resources/testblockextensions.groovy'))
+
         when:
         String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
 
@@ -179,6 +180,43 @@ blacklisted is a blacklisted word.
         rendered.contains('BUT THIS SHOULD BE UPPERCASE')
         rendered.contains('and this should be lowercase')
         rendered.contains('Ignore this.')
+    }
+
+    def 'Should apply Postprocessor from String'() {
+        given:
+        String extension = new File('src/test/resources/testpostprocessorextension.groovy').text
+        AsciidoctorExtensions.extensions(extension)
+
+        when:
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
+
+        then:
+        rendered.contains('Copyright Acme, Inc.')
+    }
+
+    def 'Should apply Postprocessor from Closure'() {
+        given:
+        String copyright = "Copyright Acme, Inc."
+        AsciidoctorExtensions.extensions {
+            postprocessor {
+                document, output ->
+                    if (document.basebackend("html")) {
+                        org.jsoup.nodes.Document doc = Jsoup.parse(output, "UTF-8")
+
+                        def contentElement = doc.getElementsByTag("body")
+                        contentElement.append(copyright)
+                        doc.html()
+                    } else {
+                        throw new IllegalArgumentException("Expected html!")
+                    }
+            }
+        }
+
+        when:
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
+
+        then:
+        rendered.contains('Copyright Acme, Inc.')
     }
 
     def 'Should apply Postprocessor from Extension file'() {
@@ -192,6 +230,35 @@ blacklisted is a blacklisted word.
         rendered.contains('Copyright Acme, Inc.')
     }
 
+    def 'Should apply Preprocessor from String'() {
+        given:
+        String extension = new File('src/test/resources/testpreprocessorextension.groovy').text
+        AsciidoctorExtensions.extensions(extension)
+
+        when:
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
+
+        then:
+        !rendered.contains('Ignore this.')
+    }
+
+    def 'Should apply Preprocessor from Closure'() {
+        given:
+        AsciidoctorExtensions.extensions {
+            preprocessor {
+                document, reader ->
+                    reader.advance()
+                    reader
+            }
+        }
+
+        when:
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
+
+        then:
+        !rendered.contains('Ignore this.')
+    }
+
     def 'Should apply Preprocessor from Extension file'() {
         given:
         AsciidoctorExtensions.extensions(new File('src/test/resources/testpreprocessorextension.groovy'))
@@ -203,6 +270,34 @@ blacklisted is a blacklisted word.
         !rendered.contains('Ignore this.')
     }
 
+    def 'Should apply Includeprocessor from String'() {
+        given:
+        String extension = new File('src/test/resources/testincludeprocessorextension.groovy').text
+        AsciidoctorExtensions.extensions(extension)
+
+        when:
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
+
+        then:
+        rendered.contains('The content of the URL')
+    }
+
+    def 'Should apply Includeprocessor from Closure'() {
+        given:
+        AsciidoctorExtensions.extensions {
+            include_processor(filter: { it.startsWith("http") }) {
+                document, reader, target, attributes ->
+                    reader.push_include("The content of the URL", target, target, 1, attributes);
+            }
+        }
+
+        when:
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
+
+        then:
+        rendered.contains('The content of the URL')
+    }
+
     def 'Should apply Includeprocessor from Extension file'() {
         given:
         AsciidoctorExtensions.extensions(new File('src/test/resources/testincludeprocessorextension.groovy'))
@@ -212,13 +307,24 @@ blacklisted is a blacklisted word.
 
         then:
         rendered.contains('The content of the URL')
-        println rendered
+    }
+
+    def 'Should apply BlockMacroProcessor from String'() {
+        given:
+        String extension = new File('src/test/resources/testblockmacroextension.groovy').text
+        AsciidoctorExtensions.extensions(extension)
+
+        when:
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
+
+        then:
+        rendered.contains("https://gist.github.com/123456.js")
     }
 
     def 'Should apply BlockMacroProcessor from Closure'() {
         given:
         AsciidoctorExtensions.extensions {
-            block_macro ("gist") {
+            block_macro("gist") {
                 parent, target, attributes ->
                     String content = """<div class="content">
 <script src="https://gist.github.com/${target}.js"></script>
@@ -243,6 +349,18 @@ blacklisted is a blacklisted word.
 
         then:
         rendered.contains("https://gist.github.com/123456.js")
+    }
+
+    def 'Should apply InlineMacroProcessor from String'() {
+        given:
+        String extension = new File('src/test/resources/testinlinemacroprocessorextension.groovy').text
+        AsciidoctorExtensions.extensions(extension)
+
+        when:
+        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
+
+        then:
+        rendered.contains('<a href="gittutorial.html">gittutorial</a>')
     }
 
     def 'Should apply InlineMacroProcessor from Closure'() {
@@ -274,6 +392,23 @@ blacklisted is a blacklisted word.
         rendered.contains('<a href="gittutorial.html">gittutorial</a>')
     }
 
+    def 'Should apply Treeprocessor from String'() {
+        given:
+        String extension = new File('src/test/resources/testtreeprocessorextension.groovy').text
+        AsciidoctorExtensions.extensions(extension)
+
+        when:
+        String rendered = Asciidoctor.Factory.create().convert('''
+$ echo "Hello, World!"
+
+$ gem install asciidoctor
+''', [:])
+
+        then:
+        rendered.contains('<div class="listingblock terminal">')
+        rendered.contains('<span class="command">gem install asciidoctor</span>')
+    }
+
     def 'Should apply Treeprocessor from Closure'() {
         given:
         AsciidoctorExtensions.extensions {
@@ -288,7 +423,7 @@ blacklisted is a blacklisted word.
                             def resultLines = lines.collect {
                                 it.startsWith('$') ? "<span class=\"command\">${it.substring(2)}</span>".toString() : it
                             }
-                            blocks[i] = createBlock(document, "listing", resultLines, attributes,[:])
+                            blocks[i] = createBlock(document, "listing", resultLines, attributes, [:])
                         }
                     }
             }
@@ -322,6 +457,24 @@ $ gem install asciidoctor
         rendered.contains('<span class="command">gem install asciidoctor</span>')
     }
 
+    def 'Should apply DocinfoProcessor from String'() {
+        given:
+        String extension = new File('src/test/resources/testdocinfoprocessorextension.groovy').text
+        AsciidoctorExtensions.extensions(extension)
+
+        when:
+        String rendered = Asciidoctor.Factory.create().convert(
+                '''
+= Hello
+
+World''',
+                options().headerFooter(true).safe(SafeMode.SERVER).toFile(false).get());
+
+        then:
+        // (?ms) Multiline regexp with dotall (= '.' matches newline as well)
+        rendered ==~ /(?ms).*<head>.*<meta name="hello" content="world">.*<\/head>.*/
+    }
+
     def 'Should apply DocinfoProcessor from Closure'() {
         given:
         String metatag = '<meta name="hello" content="world">'
@@ -344,9 +497,23 @@ World''',
         rendered ==~ /(?ms).*<head>.*<meta name="hello" content="world">.*<\/head>.*/
     }
 
-    /*
-    * Tests deprecated method, to delete at some point.
-    */
+    def 'Should apply DocinfoProcessor from Extension file'() {
+        given:
+        AsciidoctorExtensions.extensions(new File('src/test/resources/testdocinfoprocessorextension.groovy'))
+
+        when:
+        String rendered = Asciidoctor.Factory.create().convert(
+                '''
+= Hello
+
+World''',
+                options().headerFooter(true).safe(SafeMode.SERVER).toFile(false).get());
+
+        then:
+        // (?ms) Multiline regexp with dotall (= '.' matches newline as well)
+        rendered ==~ /(?ms).*<head>.*<meta name="hello" content="world">.*<\/head>.*/
+    }
+
     def 'Should apply BlockMacroProcessor from Closure with string parameter'() {
         given:
 
@@ -369,9 +536,6 @@ World''',
         rendered.contains('Ignore this.')
     }
 
-    /*
-    * Tests deprecated method, to delete at some point.
-    */
     def 'Should apply BlockMacroProcessor from Closure with named parameter'() {
         given:
 
@@ -394,9 +558,6 @@ World''',
         rendered.contains('Ignore this.')
     }
 
-    /*
-    * Tests deprecated method, to delete at some point.
-    */
     def 'Should apply InlineMacroProcessor from Closure with named parameter'() {
         given:
 
@@ -415,9 +576,6 @@ World''',
         rendered.contains('<a href="gittutorial.html">gittutorial</a>')
     }
 
-    /*
-    * Tests deprecated method, to delete at some point.
-    */
     def 'Should apply InlineMacroProcessor from Closure with string parameter'() {
         given:
 
@@ -434,26 +592,6 @@ World''',
 
         then:
         rendered.contains('<a href="gittutorial.html">gittutorial</a>')
-    }
-
-    /*
-    * Tests deprecated method, to delete at some point.
-    */
-    def 'Should apply Includeprocessor from Closure'() {
-        given:
-        AsciidoctorExtensions.extensions {
-            include_processor (filter: {it.startsWith("http")}) {
-                document, reader, target, attributes ->
-                    reader.push_include("The content of the URL", target, target, 1, attributes);
-            }
-        }
-
-        when:
-        String rendered = Asciidoctor.Factory.create().convert(TEST_DOC_BLOCK, [:])
-
-        then:
-        rendered.contains('The content of the URL')
-        println rendered
     }
 
 }
