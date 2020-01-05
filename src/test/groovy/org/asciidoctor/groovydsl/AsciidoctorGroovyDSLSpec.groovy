@@ -298,7 +298,7 @@ blacklisted is a blacklisted word.
         rendered.contains('The content of the URL')
     }
 
-    def 'Should apply Includeprocessor from Extension file'() {
+    def 'Should apply IncludeProcessor from Extension file'() {
         given:
         AsciidoctorExtensions.extensions(new File('src/test/resources/testincludeprocessorextension.groovy'))
 

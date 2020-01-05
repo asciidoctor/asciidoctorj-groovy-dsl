@@ -1,13 +1,13 @@
 = Asciidoctor Groovy DSL
 Robert Panzer <https://github.com/robertpanzer[@bobbytank42]>
-:version: 0.0.1-SNAPSHOT
+:released-version: 1.5.5
 :asciidoc-url: http://asciidoc.org
-:asciidoctor-url: http://asciidoctor.org
-:groovy-url: http://beta.groovy-lang.org/
-:gradle-url: http://gradle.org/
+:asciidoctor-url: https://asciidoctor.org
+:groovy-url: https://www.groovy-lang.org/
+:gradle-url: https://gradle.org/
 :asciidoctorj: https://github.com/asciidoctor/asciidoctorj
 :lordofthejars: https://github.com/lordofthejars
-:asciidoctor-docs: http://asciidoctor.org/docs/
+:asciidoctor-docs: https://asciidoctor.org/docs/
 :project-name: asciidoctor-groovy-dsl
 
 The {doctitle} allows to define Asciidoctor extensions in {groovy-url}[Groovy].
@@ -21,32 +21,33 @@ endif::[]
 To see the DSL in action at once simply fire up `groovyConsole`.
 Then execute this code:
 
-[source,groovy]
+[source,groovy,subs="attributes+"]
 ----
 @GrabConfig(systemClassLoader=true)
-@Grab(group='org.asciidoctor', module='asciidoctorj-groovy-dsl', version='1.0.0.Alpha.2') // <1>
+@Grab(group='org.asciidoctor', module='asciidoctorj-groovy-dsl', version='{released-version}') // <1>
 import org.asciidoctor.groovydsl.AsciidoctorExtensions
 import org.asciidoctor.Asciidoctor
 
 AsciidoctorExtensions.extensions{  //<2>
     block(name: 'BIG', contexts: [':paragraph']) {
         parent, reader, attributes ->
-        def upperLines = reader.readLines()
+        def uppercaseLines = reader.readLines()
         .collect {it.toUpperCase()}
         .inject('') {a, b -> a + '\n' + b}
-    
-        createBlock(parent, 'paragraph', [upperLines], attributes, [:])
+
+        createBlock(parent, 'paragraph', [uppercaseLines], attributes, [:])
     }
 }
-Asciidoctor.Factory.create().render('''
+
+println Asciidoctor.Factory.create().convert('''
 [BIG]
 Hello World
 ''', [:]) // <3>
 ----
 <1> Grab the module from jCenter. This fetches AsciidoctorJ transitively as well.
-<2> Register as block extension that is defined inline in this example.
-Extensions can also be passed as files.
-<3> Invoke AsciidoctorJ to render the passed string to HTML.
+<2> Register as block extension.
+Here, it is defined inline but extensions can also be passed as files or string values.
+<3> Invoke AsciidoctorJ to convert the passed string to HTML in the console.
 
 This results in:
 
@@ -60,9 +61,10 @@ HELLO WORLD</p>
 
 == Usage
 
-To use the DSL you have to add a dependency on `org.asciidoctor:asciidoctorj-groovy-dsl:1.0.0.preview2` on jCenter.
+To use the DSL you have to add a dependency on `org.asciidoctor:asciidoctorj-groovy-dsl:{released-version}` on jCenter.
 
-The integration into a {gradle-url}[Gradle] project is straightforward. To use AsciidoctorJ you also add the JCenter repository and add the respective dependency.
+The integration into a {gradle-url}[Gradle] project is straightforward.
+To use AsciidoctorJ you also add the JCenter repository and add the respective dependency.
 
 [source,groovy]
 ----
@@ -76,7 +78,8 @@ dependencies {
 ----
 
 
-Extensions can be defined inline in a groovy closure or in separate files. Extensions have to configured at the class `org.asciidoctor.groovydsl.AsciidoctorExtensions`. Extensions always have to be registered *before* creating the Asciidoctor instance.
+Extensions can be defined inline in a groovy closure, and also in a separate file or string value.
+All extensions must be configured at the class `org.asciidoctor.groovydsl.AsciidoctorExtensions`, and always be registered *before* creating the `Asciidoctor` instance.
 
 This is an example of how to define an extension inline in a groovy script and render a file:
 
@@ -85,47 +88,47 @@ This is an example of how to define an extension inline in a groovy script and r
 AsciidoctorExtensions.extensions {
     block(name: 'BIG', contexts: [':paragraph']) {
         parent, reader, attributes ->
-        def upperLines = reader.readLines()
+        def uppercaseLines = reader.readLines()
         .collect {it.toUpperCase()}
         .inject('') {a, b -> a + '\n' + b}
 
-        createBlock(parent, 'paragraph', [upperLines], attributes, [:])
+        createBlock(parent, 'paragraph', [uppercaseLines], attributes, [:])
     }
 }
 
-Asciidoctor.Factory.create().renderFile('mydocument.ad', [:])
+Asciidoctor.Factory.create().convertFile('mydocument.ad', [:])
 ----
 
 This is an example of how to define an extension in a separate file `bigblockextension.groovy`.
 
 [source,groovy]
+.bigblockextension.groovy
 ----
 block(name: 'BIG', contexts: [':paragraph']) {
     parent, reader, attributes ->
-    def upperLines = reader.readLines()
+    def uppercaseLines = reader.readLines()
     .collect {it.toUpperCase()}
     .inject('') {a, b -> a + '\n' + b}
 
-    createBlock(parent, 'paragraph', [upperLines], attributes, [:])
+    createBlock(parent, 'paragraph', [uppercaseLines], attributes, [:])
 }
 ----
-
 
 [source,groovy]
 ----
 AsciidoctorExtensions.extensions(new File('bigblockextension.groovy'))
-Asciidoctor.Factory.create().renderFile('mydocument.ad', [:])
+Asciidoctor.Factory.create().convertFile('mydocument.ad', [:])
 ----
 
-Both examples will render the following document as shown below:
+Both examples will convert the following document as shown below:
 
-[source,asciidoctor]
+[source,asciidoc]
 ----
 [BIG]
 Hello, World!
 ----
 
-This will result in:
+This will result in all text in the `[BIG]` block to be converted to upper case:
 
 ====
 HELLO, WORLD!
@@ -134,14 +137,14 @@ HELLO, WORLD!
 == Description of the DSL
 
 For every Processor class in {asciidoctorj}[AsciidoctorJ] there is a function offered by the DSL to simply define such an extension.
-The following sections show examples for each kind of Extension.
-Basically every extension is defined by calling the correct function for the extension type passing options and a closure that is the extension action.
-Every closure that is an extension action has an instance of the respective Processor class as its delegate.
+The following sections show examples for each kind of extension.
+Basically every extension is defined by calling the correct function for the extension type, passing options and a closure that holds the extension logic.
+Every closure has an instance of the respective Processor class as its delegate.
 That means that all methods provided by `org.asciidoctor.extensions.Processor` and its subclasses are directly available.
 
 === BlockProcessor
 
-A BlockProcessor registers for a certain block name and context.
+Block processors are registered using the function `block` and it must define at least the block name and context.
 The result of the closure will replace the original block.
 
 The following example registers an extension for paragraphs having the block name `BIG`:
@@ -150,26 +153,26 @@ The following example registers an extension for paragraphs having the block nam
 ----
 block(name: 'BIG', contexts: [':paragraph']) {
     parent, reader, attributes ->
-    def upperLines = reader.readLines()
+    def uppercaseLines = reader.readLines()
     .collect {it.toUpperCase()}
     .inject('') {a, b -> a + '\n' + b}
 
-    createBlock(parent, 'paragraph', [upperLines], attributes, [:])
+    createBlock(parent, 'paragraph', [uppercaseLines], attributes, [:])
 }
 ----
 
 There is also a short form that only takes a block name and the closure.
-It automatically registers for 'open' and 'paragraph' blocks:
+It automatically registers for 'open' and 'paragraph' block's context:
 
 [source,groovy]
 ----
 block('small') {
     parent, reader, attributes ->
-    def lowerLines = reader.readLines()
+    def lowercaseLines = reader.readLines()
     .collect {it.toLowerCase()}
     .inject('') {a, b -> a + '\n' + b}
 
-    createBlock(parent, 'paragraph', [lowerLines], attributes, [:])
+    createBlock(parent, 'paragraph', [lowercaseLines], attributes, [:])
 }
 ----
 
@@ -177,14 +180,27 @@ block('small') {
 
 Block macros processors are registered using the function `block_macro`.
 It requires the option `name` that defines the macro name.
-There is also the long form taking the option map and the short form that only takes the name.
+There is also the long form taking an option map and the short form that only takes the name.
 
 [source,groovy]
+.Long form: defining name with an options map
 ----
 block_macro (name: 'gist') {
     parent, target, attributes ->
-    String content = """<div class="content"> 
-<script src="https://gist.github.com/${target}.js"></script> 
+    String content = """<div class="content">
+<script src="https://gist.github.com/${target}.js"></script>
+</div>"""
+    createBlock(parent, "pass", [content], attributes, config);
+}
+----
+
+[source,groovy]
+.Short form: defining name directly
+----
+block_macro ('gist') {
+    parent, target, attributes ->
+    String content = """<div class="content">
+<script src="https://gist.github.com/${target}.js"></script>
 </div>"""
     createBlock(parent, "pass", [content], attributes, config);
 }
@@ -192,16 +208,16 @@ block_macro (name: 'gist') {
 
 The extension will be called for a block like this:
 
-[source,asciidoctor]
+[source,asciidoc]
 ----
 gist::123456[]
 ----
 
-The extension will create a passthrough block that finally gets rendered to this:
+The extension will create a passthrough block that finally gets converted to this:
 
 ====
-<div class="content"> 
-<script src="https://gist.github.com/123456.js"></script> 
+<div class="content">
+<script src="https://gist.github.com/123456.js"></script>
 </div>
 ====
 
@@ -211,30 +227,40 @@ Inline macro processors are registered using the function `inline_macro`.
 It also requires the `name` option or the name given as the only additional parameter to the closure.
 
 [source,groovy]
+.Long form: defining name with an options map
 ----
-inline_macro (name: "man") {
+inline_macro (name: 'man') {
     parent, target, attributes ->
-    options=["type": ":link", "target": target + ".html"]
-    createPhraseNode(parent, "anchor", target, attributes, options).render()
+    options = [type: ":link", target: target + ".html"]
+    createInline(parent, "anchor", target, attributes, options).render()
+}
+----
+
+[source,groovy]
+.Short form: defining name directly
+----
+inline_macro ('man') {
+    parent, target, attributes ->
+    options = ["type": ":link", target: target + ".html"]
+    createInline(parent, "anchor", target, attributes, options).render()
 }
 ----
 
 The extension will be called for text like this:
 
-[source,asciidoctor]
+[source,asciidoc]
 ----
 See man:gittutorial[7] to get started.
 ----
 
 The extension will create a link to the gittutorial.html.
 
-
 === Preprocessor
 
 Preprocessor extensions are registered using the function `preprocessor`.
 It does not require any additional options besides the extension action.
 
-The following example simply removes the first line of the document.
+The following example will simply remove the first line of the document.
 
 [source,groovy]
 ----
@@ -251,7 +277,8 @@ Postprocessor extensions are registered using the function `postprocessor`.
 It does not require any additional options besides the extension action.
 The task action must return the resulting string.
 
-The following example assumes that the html backend is used and adds a copyright notice at the end of the document:
+Note that postprocessors are dependant on the specific backend being used (html, pdf, etc.).
+The following example assumes we are converting to HTML and adds a copyright notice at the end of the document:
 
 [source,groovy]
 ----
@@ -261,9 +288,8 @@ String copyright = "Copyright Acme, Inc."
 
 postprocessor {
     document, output ->
-    if(document.basebackend("html")) {
+    if (document.basebackend("html")) {
         org.jsoup.nodes.Document doc = Jsoup.parse(output, "UTF-8")
-
         def contentElement = doc.getElementsByTag("body")
         contentElement.append(copyright)
         doc.html()
@@ -277,24 +303,32 @@ postprocessor {
 
 IncludeProcessor extensions are registered using the function `include_processor`.
 The options must contain an entry for the key `filter` that points to a closure that decides whether to call this extension for the current include macro.
+This closure receives the value of the include
 
-The following example registers for all include macros that include resource starting with `http`.
+The following extension registers for all include macros whose resource starts with `https` like the one in the example below.
 
 [source,groovy]
 ----
 String content = "The content of the URL"
 
-include_processor (filter: {it.startsWith("http")}) {
+include_processor (filter: {it.startsWith("https")}) {
     document, reader, target, attributes ->
-    reader.push_include(content, target, target, 1, attributes);					
+    reader.push_include(content, target, target, 1, attributes)
 }
+----
+
+[source,asciidoc]
+----
+This is a remote secures resource to incude:
+
+include::https://github.com/asciidoctor/asciidoctorj-groovy-dsl/blob/master/README.adoc[]
 ----
 
 === Treeprocessor
 
 Treeprocessor extensions are registered using the function `treeprocessor`.
 
-The following example renders blocks that start with a `$` sign as a listing.
+The following example renders blocks that start with a `$` sign as a listing with the role "command".
 
 [source,groovy]
 ----
@@ -314,6 +348,15 @@ treeprocessor {
         }
     }
 }
+----
+
+Here is an example of the source document.
+
+[source,asciidoc]
+----
+$ echo "Hello, World!"
+
+$ gem install asciidoctor
 ----
 
 === DocinfoProcessor
