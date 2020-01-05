@@ -15,7 +15,7 @@
  */
 package org.asciidoctor.groovydsl.extensions
 
-import org.asciidoctor.ast.AbstractBlock
+import org.asciidoctor.ast.StructuralNode
 import org.asciidoctor.extension.BlockProcessor
 import org.asciidoctor.extension.Reader
 import org.asciidoctor.groovydsl.AsciidoctorExtensionHandler
@@ -30,7 +30,7 @@ class DelegatingBlockProcessor extends BlockProcessor {
         cl.delegate = this
     }
 
-    Object process(AbstractBlock parent, Reader reader, Map<String, Object> attributes) {
+    Object process(StructuralNode parent, Reader reader, Map<String, Object> attributes) {
         cl.call(parent, reader, attributes)
     }
 

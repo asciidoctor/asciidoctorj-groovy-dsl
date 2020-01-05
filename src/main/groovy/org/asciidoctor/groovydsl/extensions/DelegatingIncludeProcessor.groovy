@@ -15,7 +15,7 @@
  */
 package org.asciidoctor.groovydsl.extensions
 
-import org.asciidoctor.ast.DocumentRuby
+import org.asciidoctor.ast.Document
 import org.asciidoctor.extension.IncludeProcessor
 import org.asciidoctor.extension.PreprocessorReader
 
@@ -32,10 +32,12 @@ class DelegatingIncludeProcessor extends IncludeProcessor {
         cl.delegate = this
         
     }
+
     boolean handles(String target) {
         filter.call(target)
     }
-    void process(DocumentRuby document, PreprocessorReader reader, String target, Map<String, Object> attributes) {
+
+    void process(Document document, PreprocessorReader reader, String target, Map<String, Object> attributes) {
         cl.call(document, reader, target, attributes)
     }
 
