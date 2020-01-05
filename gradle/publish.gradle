@@ -92,15 +92,17 @@ def pomConfig = {
     }
 }
 
-publishing {
-    publications {
-        mavenCustom(MavenPublication) {
-            from components.java
-            artifact sourceJar
-            setGroupId 'org.asciidoctor'
-            setArtifactId(projectArtifactId)
-            pom.withXml {
-                asNode().children().last() + pomConfig
+afterEvaluate {
+    publishing {
+        publications {
+            mavenCustom(MavenPublication) {
+                from components.java
+                artifact sourceJar
+                setGroupId 'org.asciidoctor'
+                setArtifactId(projectArtifactId)
+                pom.withXml {
+                    asNode().children().last() + pomConfig
+                }
             }
         }
     }
