@@ -6,12 +6,11 @@ buildscript {
 }
 
 plugins {
-    id "com.jfrog.bintray" version "1.6"
+    id "com.jfrog.bintray" version "1.8.4"
 }
 
 apply plugin: 'groovy'
 apply plugin: 'codenarc'
-apply plugin: 'maven-publish'
 apply from: 'gradle/publish.gradle'
 
 ext {
