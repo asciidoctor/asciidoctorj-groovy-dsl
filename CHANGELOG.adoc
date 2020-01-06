@@ -1,0 +1,24 @@
+= AsciidoctorJ Groovy DSL Changelog
+:uri-asciidoctor: http://asciidoctor.org
+:uri-asciidoc: {uri-asciidoctor}/docs/what-is-asciidoc
+:uri-repo: https://github.com/asciidoctor/asciidoctorj-groovy-dsl
+:icons: font
+:star: icon:star[role=red]
+ifndef::icons[]
+:star: &#9733;
+endif::[]
+
+This document provides a high-level view of the changes introduced in AsciidoctorJ Groovy DSL by release.
+For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
+
+== Unreleased
+
+Build::
+
+Documentation::
+
+Bug Fixes::
+
+Improvements::
+
+
