@@ -1,6 +1,7 @@
 = Asciidoctor Groovy DSL
 Robert Panzer <https://github.com/robertpanzer[@bobbytank42]>
-:released-version: 1.5.5
+:released-version: 1.6.0
+:asciidoctorj-version: 2.2.0
 :asciidoc-url: http://asciidoc.org
 :asciidoctor-url: https://asciidoctor.org
 :groovy-url: https://www.groovy-lang.org/
@@ -28,7 +29,7 @@ Then execute this code:
 import org.asciidoctor.groovydsl.AsciidoctorExtensions
 import org.asciidoctor.Asciidoctor
 
-AsciidoctorExtensions.extensions{  //<2>
+AsciidoctorExtensions.extensions {  //<2>
     block(name: 'BIG', contexts: [':paragraph']) {
         parent, reader, attributes ->
         def uppercaseLines = reader.readLines()
@@ -44,7 +45,8 @@ println Asciidoctor.Factory.create().convert('''
 Hello World
 ''', [:]) // <3>
 ----
-<1> Grab the module from jCenter. This fetches AsciidoctorJ transitively as well.
+<1> Grab the module from jCenter.
+This fetches AsciidoctorJ transitively as well.
 <2> Register as block extension.
 Here, it is defined inline but extensions can also be passed as files or string values.
 <3> Invoke AsciidoctorJ to convert the passed string to HTML in the console.
@@ -61,28 +63,51 @@ HELLO WORLD</p>
 
 == Usage
 
-To use the DSL you have to add a dependency on `org.asciidoctor:asciidoctorj-groovy-dsl:{released-version}` on jCenter.
+To use the DSL you have to add a dependency on `org.asciidoctor:asciidoctorj-groovy-dsl:{released-version}` from jCenter.
 
 The integration into a {gradle-url}[Gradle] project is straightforward.
 To use AsciidoctorJ you also add the JCenter repository and add the respective dependency.
 
-[source,groovy]
+[source,groovy,subs="attributes+"]
 ----
 repositories {
     jcenter()
 }
+
 dependencies {
-    compile 'org.asciidoctor:asciidoctorj:1.5.0.Final'
-    compile 'org.asciidoctor:asciidoctorj-groovy-dsl:1.0.0.preview1'
+    compile 'org.asciidoctor:asciidoctorj:{asciidoctorj-version}'
+    compile 'org.asciidoctor:asciidoctorj-groovy-dsl:{released-version}'
 }
 ----
-
 
 Extensions can be defined inline in a groovy closure, and also in a separate file or string value.
 All extensions must be configured at the class `org.asciidoctor.groovydsl.AsciidoctorExtensions`, and always be registered *before* creating the `Asciidoctor` instance.
 
-This is an example of how to define an extension inline in a groovy script and render a file:
+There are two ways to register extensions using AsciidoctorExtensions:
 
+. Creating an instance. +
+This is the recommended method since is thread-safe.
+Once an instance is created, extensions can be registered using the `addExtension` method passing a closure, file or string value.
++
+[source,groovy]
+----
+def extensions = new AsciidoctorExtensions()
+extensions.addExtension {
+    block(name: 'BIG', contexts: [':paragraph']) {
+        parent, reader, attributes ->
+        def uppercaseLines = reader.readLines()
+        .collect {it.toUpperCase()}
+        .inject('') {a, b -> a + '\n' + b}
+
+        createBlock(parent, 'paragraph', [uppercaseLines], attributes, [:])
+    }
+}
+----
+
+. Static registration.
+This method is offered for convenience and ease of use.
+The example below shows how to define an extension inline in a groovy script and render a file:
++
 [source,groovy]
 ----
 AsciidoctorExtensions.extensions {
@@ -99,6 +124,7 @@ AsciidoctorExtensions.extensions {
 Asciidoctor.Factory.create().convertFile('mydocument.ad', [:])
 ----
 
+As mentioned, extensions can be also defined from other sources.
 This is an example of how to define an extension in a separate file `bigblockextension.groovy`.
 
 [source,groovy]
@@ -116,11 +142,11 @@ block(name: 'BIG', contexts: [':paragraph']) {
 
 [source,groovy]
 ----
-AsciidoctorExtensions.extensions(new File('bigblockextension.groovy'))
+new AsciidoctorExtensions().addExtension(new File('bigblockextension.groovy'))
 Asciidoctor.Factory.create().convertFile('mydocument.ad', [:])
 ----
 
-Both examples will convert the following document as shown below:
+All examples seen in this section will convert the following document as shown below:
 
 [source,asciidoc]
 ----
@@ -139,7 +165,8 @@ HELLO, WORLD!
 For every Processor class in {asciidoctorj}[AsciidoctorJ] there is a function offered by the DSL to simply define such an extension.
 The following sections show examples for each kind of extension.
 Basically every extension is defined by calling the correct function for the extension type, passing options and a closure that holds the extension logic.
-Every closure has an instance of the respective Processor class as its delegate.
+
+Under the hood, every closure has an instance of the respective Processor class as its delegate.
 That means that all methods provided by `org.asciidoctor.extensions.Processor` and its subclasses are directly available.
 
 === BlockProcessor
@@ -372,7 +399,7 @@ docinfo_processor {
 }
 ----
 
-To add content in the footer of the document pass the location option like this:
+Additionally, to add content in the footer of the document pass the location option like this:
 
 [source,groovy]
 ----
