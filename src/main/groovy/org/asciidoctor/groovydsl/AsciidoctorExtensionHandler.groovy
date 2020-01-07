@@ -70,20 +70,6 @@ class AsciidoctorExtensionHandler {
         block_macro([(OPTION_NAME): name], cl)
     }
 
-    /**
-     * @deprecated Please use {@link #block_macro(java.util.Map, groovy.lang.Closure)} instead
-     */
-    void blockmacro(Map options, @DelegatesTo(BlockMacroProcessor) Closure cl) {
-        block_macro(options, cl)
-    }
-
-    /**
-     * @deprecated Please use {@link #block_macro(java.lang.String, groovy.lang.Closure)} instead
-     */
-    void blockmacro(String name, @DelegatesTo(BlockMacroProcessor) Closure cl) {
-        block_macro([(OPTION_NAME): name], cl)
-    }
-
     void postprocessor(Map options=[:], @DelegatesTo(Postprocessor) Closure cl) {
         asciidoctor.javaExtensionRegistry().postprocessor(new DelegatingPostprocessor(options, cl))
     }
@@ -98,34 +84,11 @@ class AsciidoctorExtensionHandler {
         asciidoctor.javaExtensionRegistry().includeProcessor(new DelegatingIncludeProcessor(optionsWithoutFilter, filter, cl))
     }
 
-    /**
-     * @deprecated Please use {@link #include_processor(java.util.Map, groovy.lang.Closure)} instead
-     */
-    void includeprocessor(Map options=[:], @DelegatesTo(IncludeProcessor) Closure cl) {
-        Closure filter = options[(OPTION_FILTER)]
-        Map optionsWithoutFilter = options - options.subMap([OPTION_FILTER])
-        asciidoctor.javaExtensionRegistry().includeProcessor(new DelegatingIncludeProcessor(optionsWithoutFilter, filter, cl))
-    }
-
     void inline_macro(Map options, @DelegatesTo(InlineMacroProcessor) Closure cl) {
         asciidoctor.javaExtensionRegistry().inlineMacro(new DelegatingInlineMacroProcessor(options[OPTION_NAME], options, cl))
     }
 
     void inline_macro(String macroName, @DelegatesTo(InlineMacroProcessor) Closure cl) {
-        inline_macro([(OPTION_NAME): macroName], cl)
-    }
-
-    /**
-     * @deprecated Please use {@link #inline_macro(java.util.Map, groovy.lang.Closure)} instead
-     */
-    void inlinemacro(Map options, @DelegatesTo(InlineMacroProcessor) Closure cl) {
-        asciidoctor.javaExtensionRegistry().inlineMacro(new DelegatingInlineMacroProcessor(options[OPTION_NAME], options, cl))
-    }
-
-    /**
-     * @deprecated Please use {@link #inline_macro(java.lang.String, groovy.lang.Closure)} instead
-     */
-    void inlinemacro(String macroName, @DelegatesTo(InlineMacroProcessor) Closure cl) {
         inline_macro([(OPTION_NAME): macroName], cl)
     }
 

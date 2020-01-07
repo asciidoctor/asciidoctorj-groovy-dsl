@@ -13,12 +13,22 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 == Unreleased
 
-Build::
-
-Documentation::
-
-Bug Fixes::
+This version is the graduation of the previous 1.6.0-alpha.1 branch making it compatible with the latest improvements from Asciidoctorj v2.2.0.
+Note that extensions using version 1.0.0.preview2 may not be compatible.
 
 Improvements::
 
+* Allow AsciidoctorExtensions to be instantiated (https://github.com/ysb33r[@ysb33r]) (https://github.com/asciidoctor/asciidoctorj-groovy-dsl/issues/18[#18])
+* Upgrade to Asciidoctorj v2.2.0 (https://github.com/abelsromero[@abelsromero]) (https://github.com/asciidoctor/asciidoctorj-groovy-dsl/pull/24[#24]).
+Continuation of the previous work of https://github.com/robertpanzer[@robertpanzer] in https://github.com/asciidoctor/asciidoctorj-groovy-dsl/pull/21[#21] and https://github.com/asciidoctor/asciidoctorj-groovy-dsl/pull/22[#22]
+* Removed deprecated methods `blockmacro`, `includeprocessor`, `inlinemacro`. Use the following instead: `block_macro`, `include_processor`, `inline_macro` (https://github.com/abelsromero[@abelsromero]) (https://github.com/asciidoctor/asciidoctorj-groovy-dsl/pull/27[#27])
 
+Bug Fixes::
+
+Documentation::
+
+* Fix artifact version in README examples (https://github.com/gtoast[@gtoast]) (https://github.com/asciidoctor/asciidoctorj-groovy-dsl/pull/16[#16])
+
+Build::
+
+* Upgrade Gradle to v5.6.4 to support building with Java versions superior to 8 (https://github.com/abelsromero[@abelsromero]) (https://github.com/asciidoctor/asciidoctorj-groovy-dsl/pull/25[#25])
