@@ -21,111 +21,86 @@ ext {
     buildDate = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
 }
 
-apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.bintray'
+apply plugin: 'de.marcphilipp.nexus-publish'
 
 def projectArtifactId = 'asciidoctorj-groovy-dsl'
+
+publishing {
+    publications.create(project.ext.publicationName, MavenPublication) {
+
+        from components.java
+
+        pom {
+            name = project.name
+            description = project.description
+            url = 'https://github.com/asciidoctor/asciidoctorj-groovy-dsl'
+            inceptionYear = '2014'
+            licenses {
+                license {
+                    name = 'The Apache Software License, Version 2.0'
+                    url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution = 'repo'
+                }
+            }
+            issueManagement {
+                system = 'github'
+                url = 'https://github.com/asciidoctor/asciidoctorj-groovy-dsl/issues'
+            }
+            scm {
+                url = 'https://github.com/asciidoctor/asciidoctorj-groovy-dsl'
+            }
+
+            developers {
+                developer {
+                    id = 'mojavelinux'
+                    name = 'Dan Allen'
+                    email = 'dan.j.allen@gmail.com'
+                    timezone = '-7'
+                    roles = ['Contributor']
+                }
+                developer {
+                    id = 'robertpanzer'
+                    name = 'Robert Panzer'
+                    email = 'robert.panzer.pb@gmail.com'
+                    timezone = '1'
+                    roles = ['Contributor']
+                }
+            }
+        }
+    }
+}
 
 jar {
     manifest {
         attributes(
-            'Built-By': System.properties['user.name'],
-            'Created-By': System.properties['java.version'] + " (" + System.properties['java.vendor'] + " " + System.getProperty("java.vm.version") + ")",
-            'Build-Date': project.buildTime,
-            'Build-Time': project.buildDate,
-            'Specification-Title': projectArtifactId,
-            'Specification-Version': project.version,
-            'Specification-Vendor': 'asciidoctor.org',
-            'Implementation-Title': projectArtifactId,
-            'Implementation-Version': project.version,
-            'Implementation-Vendor': 'asciidoctor.org'
+                'Built-By': System.properties['user.name'],
+                'Created-By': System.properties['java.version'] + " (" + System.properties['java.vendor'] + " " + System.getProperty("java.vm.version") + ")",
+                'Build-Date': project.buildTime,
+                'Build-Time': project.buildDate,
+                'Specification-Title': projectArtifactId,
+                'Specification-Version': project.version,
+                'Specification-Vendor': 'asciidoctor.org',
+                'Implementation-Title': projectArtifactId,
+                'Implementation-Version': project.version,
+                'Implementation-Vendor': 'asciidoctor.org'
         )
     }
 }
 
-def pomConfig = {
-    name projectArtifactId
-    description 'A Groovy DSL that allows to define and register asciidoctor extensions using a DSL'
-    url 'http://asciidoctor.org'
-    inceptionYear '2014'
-    licenses {
-        license([:]) {
-            name 'The Apache Software License, Version 2.0'
-            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-            distribution 'repo'
-        }
-    }
-    scm {
-        url 'https://github.com/robertpanzer/asciidoctorj-groovy-dsl'
-    }
-    developers {
-        developer {
-            id 'mojavelinux'
-            name 'Dan Allen'
-            roles {
-                role 'Asciidoctor Founder and Benevolent Dictator'
-                role 'Open Source Hero'
-            }
-        }
-        [
-            bobbytank42: 'Robert Panzer',
-        ].each { devId, devName ->
-            developer {
-                id devId
-                name devName
-                roles {
-                    role 'Developer'
-                }
-            }
-        }
-    }
-    contributors {
-        [
-        ].each { devId, devName ->
-            contributor {
-                name devName
-                roles {
-                    role 'contributor'
-                }
-            }
+publishing {
+    repositories {
+        maven {
+            name = "local"
+            // change URLs to point to your repos, e.g. http://my.org/repo
+            def releasesRepoUrl = "${rootProject.buildDir}/repos/releases"
+            def snapshotsRepoUrl = "${rootProject.buildDir}/repos/snapshots"
+            url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
         }
     }
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            mavenCustom(MavenPublication) {
-                from components.java
-                artifact sourceJar
-                setGroupId 'org.asciidoctor'
-                setArtifactId(projectArtifactId)
-                pom.withXml {
-                    asNode().children().last() + pomConfig
-                }
-            }
-        }
-    }
-}
-
-task install(dependsOn: publishToMavenLocal)
-
-if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = ''
-if (!project.hasProperty('bintrayApiKey')) ext.bintrayApiKey = ''
-
-bintray {
-    user = project.bintrayUsername
-    key = project.bintrayApiKey
-
-    dryRun = project.hasProperty('dryRun') && project.dryRun.toBoolean()
-
-    publications = ['mavenCustom']
-    pkg {
-        repo = 'maven'
-        userOrg = 'asciidoctor'
-        name = projectArtifactId
-        desc = 'A Groovy DSL that allows to define and register asciidoctor extensions using a DSL'
-        licenses = ['Apache-2.0']
-        labels = ['groovy', 'asciidoctor']
+nexusPublishing {
+    repositories {
+        sonatype()
     }
 }
