@@ -1,28 +1,49 @@
 buildscript {
-     repositories {
-         mavenLocal()
-         jcenter()
-     }
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        mavenCentral()
+        maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+    }
 }
 
 plugins {
-    id "com.jfrog.bintray" version "1.8.4"
+    id "signing"
+    id "io.codearte.nexus-staging" version "0.22.0"
+    id "de.marcphilipp.nexus-publish" version "0.4.0"
+}
+
+apply plugin: 'io.codearte.nexus-staging'
+
+
+nexusStaging {
+    if (project.hasProperty("sonatypeUsername")) {
+        username = project.sonatypeUsername
+    }
+    if (project.hasProperty("sonatypePassword")) {
+        password = project.sonatypePassword
+    }
+    repositoryDescription = "Release ${project.group} ${project.version}"
+}
+
+group = 'org.asciidoctor'
+description = 'A Groovy DSL for writing extensions for AsciidoctorJ'
+
+ext {
+    projectArtifactId = 'asciidoctorj-groovy-dsl'
+    publicationName = 'asciidoctorjGroovyDsl'
+    groovyVer = '2.4.15'
 }
 
 apply plugin: 'groovy'
 apply plugin: 'codenarc'
 apply from: 'gradle/publish.gradle'
+apply from: 'gradle/signing.gradle'
 
-ext {
-    projectArtifactId = 'asciidoctorj-groovy-dsl'
-    groupId = 'org.asciidoctor'
-
-    groovyVer = '2.4.15'
-}
 
 repositories {
-    jcenter()
-//    maven { url 'http://dl.bintray.com/lordofthejars/maven'}
+    mavenCentral()
 }
 
 dependencies {
@@ -44,13 +65,8 @@ codenarc {
     sourceSets = [project.sourceSets.main]
 }
 
-task sourceJar(type: Jar) {
-    group 'Build'
-    description 'An archive of the source code'
-    classifier 'sources'
-    from sourceSets.main.allSource
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
-artifacts {
-    sourceJar
-}
