@@ -18,6 +18,7 @@ package org.asciidoctor.groovydsl.extensions
 import org.asciidoctor.ast.Document
 import org.asciidoctor.extension.Preprocessor
 import org.asciidoctor.extension.PreprocessorReader
+import org.asciidoctor.extension.Reader
 
 class DelegatingPreprocessor extends Preprocessor {
 
@@ -29,7 +30,7 @@ class DelegatingPreprocessor extends Preprocessor {
         cl.delegate = this
     }
 
-    void process(Document document, PreprocessorReader reader) {
+    Reader process(Document document, PreprocessorReader reader) {
         cl.call(document, reader)
     }
 	

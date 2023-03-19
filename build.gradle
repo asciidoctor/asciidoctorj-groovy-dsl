@@ -36,7 +36,7 @@ repositories {
 
 dependencies {
     implementation "org.codehaus.groovy:groovy:${groovyVer}"
-    implementation 'org.asciidoctor:asciidoctorj:2.2.0'
+    implementation 'org.asciidoctor:asciidoctorj:3.0.0-SNAPSHOT'
 
     testImplementation('org.spockframework:spock-core:1.1-groovy-2.4') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'

@@ -15,7 +15,9 @@
  */
 package org.asciidoctor.groovydsl.extensions
 
-import org.asciidoctor.ast.ContentNode
+
+import org.asciidoctor.ast.PhraseNode
+import org.asciidoctor.ast.StructuralNode
 import org.asciidoctor.extension.InlineMacroProcessor
 
 class DelegatingInlineMacroProcessor extends InlineMacroProcessor {
@@ -28,7 +30,7 @@ class DelegatingInlineMacroProcessor extends InlineMacroProcessor {
         cl.delegate = this
     }
 
-    Object process(ContentNode parent, String target, Map<String, Object> attributes) {
+    PhraseNode process(StructuralNode parent, String target, Map<String, Object> attributes) {
         cl.call(parent, target, attributes)
     }
 
