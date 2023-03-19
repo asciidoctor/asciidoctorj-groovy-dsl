@@ -13,6 +13,31 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 == Unreleased
 
+Improvements::
+
+* Upgrade to Gradle 8.0.1
+
+== 2.0.2
+
+Release Date: 9.5.2021
+
+Bugfix:
+
+* Set java version in Gradle module to Java 8 https://github.com/asciidoctor/asciidoctorj-groovy-dsl/pull/43[#43]
+
+== 2.0.1
+
+Release Date: 2.3.2021
+
+Improvements::
+
+* Publish to Maven central
+
+== 2.0.0
+
+Release Date: 13.1.2020
+
+
 This version is the graduation of the previous 1.6.0-alpha.1 branch making it compatible with the latest improvements from Asciidoctorj v2.2.0.
 Note that extensions using version 1.0.0.preview2 may not be compatible.
 
