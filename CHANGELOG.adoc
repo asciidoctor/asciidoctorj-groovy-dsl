@@ -15,7 +15,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Improvements::
 
-* Upgrade to Gradle 8.0.1
+* Upgrade to Gradle 8.0.2
 
 == 2.0.2
 
