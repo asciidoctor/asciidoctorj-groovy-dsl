@@ -19,7 +19,7 @@ jobs:
         java:
           - '1.8'
           - '11.0.5'
-          - '15'
+          - '17'
         os:
           - ubuntu-latest
           - macos-latest
