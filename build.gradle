@@ -4,33 +4,21 @@ buildscript {
             url "https://plugins.gradle.org/m2/"
         }
         mavenCentral()
-        maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
 }
 
 plugins {
     id "signing"
-    id "io.codearte.nexus-staging" version "0.22.0"
-    id "de.marcphilipp.nexus-publish" version "0.4.0"
-}
-
-apply plugin: 'io.codearte.nexus-staging'
-
-
-nexusStaging {
-    if (project.hasProperty("sonatypeUsername")) {
-        username = project.sonatypeUsername
-    }
-    if (project.hasProperty("sonatypePassword")) {
-        password = project.sonatypePassword
-    }
-    repositoryDescription = "Release ${project.group} ${project.version}"
+    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
 }
 
 group = 'org.asciidoctor'
 description = 'A Groovy DSL for writing extensions for AsciidoctorJ'
 
 ext {
+    buildDateTime = new Date()
+    (buildDateOnly, buildTimeOnly) = new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm:ss.SSSZ').format(buildDateTime).split(' ')
     projectArtifactId = 'asciidoctorj-groovy-dsl'
     publicationName = 'asciidoctorjGroovyDsl'
     groovyVer = '2.4.15'
@@ -47,16 +35,16 @@ repositories {
 }
 
 dependencies {
-    compile "org.codehaus.groovy:groovy:${groovyVer}"
-    compile 'org.asciidoctor:asciidoctorj:2.2.0'
+    implementation "org.codehaus.groovy:groovy:${groovyVer}"
+    implementation 'org.asciidoctor:asciidoctorj:2.2.0'
 
-    testCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
+    testImplementation('org.spockframework:spock-core:1.1-groovy-2.4') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
         exclude group: 'org.hamcrest', module: 'hamcrest-core'
     }
-    testCompile 'junit:junit:4.12'
-    testCompile 'cglib:cglib-nodep:2.2.2'
-    testCompile 'org.jsoup:jsoup:1.7.3'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'cglib:cglib-nodep:2.2.2'
+    testImplementation 'org.jsoup:jsoup:1.15.4'
 }
 
 codenarc {
@@ -72,4 +60,19 @@ java {
 
 compileJava {
     options.release = 8
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            if (project.hasProperty("sonatypeUsername")) {
+                username = project.sonatypeUsername
+            }
+            if (project.hasProperty("sonatypePassword")) {
+                password = project.sonatypePassword
+            }
+            repositoryDescription = "Release ${project.group} ${project.version}"
+        }
+    }
+    clientTimeout = Duration.ofMinutes(5)
 }

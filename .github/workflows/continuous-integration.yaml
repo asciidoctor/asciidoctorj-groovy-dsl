@@ -2,10 +2,10 @@ name: Build Master
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
   schedule:
     - cron: '0 0 * * *'
 
@@ -19,7 +19,7 @@ jobs:
         java:
           - '1.8'
           - '11.0.5'
-          - '15'
+          - '17'
         os:
           - ubuntu-latest
           - macos-latest
