@@ -4,7 +4,7 @@ String copyright = "Copyright Acme, Inc."
 
 postprocessor {
     document, output ->
-    if(document.basebackend("html")) {
+    if(document.isBasebackend("html")) {
         org.jsoup.nodes.Document doc = Jsoup.parse(output, "UTF-8")
 
         def contentElement = doc.getElementsByTag("body")

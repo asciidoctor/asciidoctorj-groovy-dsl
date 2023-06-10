@@ -1,9 +1,9 @@
 treeprocessor {
     document ->
-    def blocks = document.blocks()
+    def blocks = document.blocks
     (0..<blocks.size()).each {
         def block = blocks[it]
-        def lines = block.lines()
+        def lines = block.lines
         if (lines.size() > 0 && lines[0].startsWith('$')) {
             Map attributes = block.attributes
             attributes["role"] = "terminal"

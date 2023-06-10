@@ -27,8 +27,8 @@ class DelegatingBlockMacroProcessor extends BlockMacroProcessor {
         this.cl = cl
         cl.delegate = this
     }
-    
-    Object process(StructuralNode parent, String target, Map<String, Object> attributes) {
+
+    StructuralNode process(StructuralNode parent, String target, Map<String, Object> attributes) {
         cl.call(parent, target, attributes)
     }
 

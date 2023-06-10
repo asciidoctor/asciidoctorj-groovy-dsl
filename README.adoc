@@ -217,7 +217,7 @@ block_macro (name: 'gist') {
     String content = """<div class="content">
 <script src="https://gist.github.com/${target}.js"></script>
 </div>"""
-    createBlock(parent, "pass", [content], attributes, config);
+    createBlock(parent, "pass", [content], attributes, config)
 }
 ----
 
@@ -229,7 +229,7 @@ block_macro ('gist') {
     String content = """<div class="content">
 <script src="https://gist.github.com/${target}.js"></script>
 </div>"""
-    createBlock(parent, "pass", [content], attributes, config);
+    createBlock(parent, "pass", [content], attributes, config)
 }
 ----
 
@@ -259,7 +259,7 @@ It also requires the `name` option or the name given as the only additional para
 inline_macro (name: 'man') {
     parent, target, attributes ->
     options = [type: ":link", target: target + ".html"]
-    createPhraseNode(parent, "anchor", target, attributes, options).convert()
+    createPhraseNode(parent, "anchor", target, attributes, options)
 }
 ----
 
@@ -269,7 +269,7 @@ inline_macro (name: 'man') {
 inline_macro ('man') {
     parent, target, attributes ->
     options = ["type": ":link", target: target + ".html"]
-    createPhraseNode(parent, "anchor", target, attributes, options).convert()
+    createPhraseNode(parent, "anchor", target, attributes, options)
 }
 ----
 
@@ -367,7 +367,7 @@ treeprocessor {
         def lines = block.lines()
         if (lines.size() > 0 && lines[0].startsWith('$')) {
             Map attributes = block.attributes()
-            attributes["role"] = "terminal";
+            attributes["role"] = "terminal"
             def resultLines = lines.collect {
                 it.startsWith('$') ? "<span class=\"command\">${it.substring(2)}</span>" : it
             }
