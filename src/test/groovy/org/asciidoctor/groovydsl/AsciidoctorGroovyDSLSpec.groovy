@@ -199,7 +199,7 @@ blacklisted is a blacklisted word.
         AsciidoctorExtensions.extensions {
             postprocessor {
                 document, output ->
-                    if (document.basebackend("html")) {
+                    if (document.isBasebackend("html")) {
                         org.jsoup.nodes.Document doc = Jsoup.parse(output, "UTF-8")
 
                         def contentElement = doc.getElementsByTag("body")
@@ -246,8 +246,7 @@ blacklisted is a blacklisted word.
         AsciidoctorExtensions.extensions {
             preprocessor {
                 document, reader ->
-                    reader.advance()
-                    reader
+                    newReader(reader.lines.tail())
             }
         }
 
@@ -286,7 +285,7 @@ blacklisted is a blacklisted word.
         AsciidoctorExtensions.extensions {
             include_processor(filter: { it.startsWith("http") }) {
                 document, reader, target, attributes ->
-                    reader.push_include("The content of the URL", target, target, 1, attributes)
+                    reader.pushInclude("The content of the URL", target, target, 1, attributes)
             }
         }
 
@@ -413,9 +412,9 @@ $ gem install asciidoctor
         AsciidoctorExtensions.extensions {
             treeprocessor {
                 document ->
-                    def blocks = document.blocks()
+                    def blocks = document.blocks
                     blocks.eachWithIndex { block, i ->
-                        def lines = block.lines()
+                        def lines = block.lines
                         if (lines.size() > 0 && lines[0].startsWith('$')) {
                             Map attributes = block.attributes
                             attributes["role"] = "terminal"
@@ -467,7 +466,7 @@ $ gem install asciidoctor
 = Hello
 
 World''',
-                Options.builder().headerFooter(true).safe(SafeMode.SERVER).toFile(false).build())
+                Options.builder().standalone(true).safe(SafeMode.SERVER).toFile(false).build())
 
         then:
         // (?ms) Multiline regexp with dotall (= '.' matches newline as well)
@@ -489,7 +488,7 @@ World''',
 = Hello
 
 World''',
-                Options.builder().headerFooter(true).safe(SafeMode.SERVER).toFile(false).build())
+                Options.builder().standalone(true).safe(SafeMode.SERVER).toFile(false).build())
 
         then:
         // (?ms) Multiline regexp with dotall (= '.' matches newline as well)
@@ -506,7 +505,7 @@ World''',
 = Hello
 
 World''',
-                Options.builder().headerFooter(true).safe(SafeMode.SERVER).toFile(false).build())
+                Options.builder().standalone(true).safe(SafeMode.SERVER).toFile(false).build())
 
         then:
         // (?ms) Multiline regexp with dotall (= '.' matches newline as well)
