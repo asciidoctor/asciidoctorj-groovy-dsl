@@ -17,7 +17,7 @@ jobs:
       max-parallel: 2
       matrix:
         java:
-          - '11.0.5'
+          - '11'
           - '17'
         os:
           - ubuntu-latest
@@ -45,6 +45,7 @@ jobs:
           fetch-depth: 1
       - uses: actions/setup-java@v3
         with:
+          distribution: temurin
           java-version: 11
       - name: Assemble
         shell: cmd
