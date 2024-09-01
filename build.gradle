@@ -21,7 +21,7 @@ ext {
     (buildDateOnly, buildTimeOnly) = new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm:ss.SSSZ').format(buildDateTime).split(' ')
     projectArtifactId = 'asciidoctorj-groovy-dsl'
     publicationName = 'asciidoctorjGroovyDsl'
-    groovyVer = '3.0.17'
+    groovyVer = '3.0.22'
 }
 
 apply plugin: 'groovy'
@@ -36,12 +36,12 @@ repositories {
 
 dependencies {
     implementation "org.codehaus.groovy:groovy:${groovyVer}"
-    implementation 'org.asciidoctor:asciidoctorj:3.0.0-alpha.1'
+    implementation 'org.asciidoctor:asciidoctorj:3.0.0'
 
-    testImplementation('org.spockframework:spock-core:2.3-groovy-3.0') {
-        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
-        exclude group: 'org.hamcrest', module: 'hamcrest-core'
-    }
+    testImplementation platform("org.spockframework:spock-bom:2.3-groovy-3.0")
+    testImplementation "org.spockframework:spock-core"
+    testImplementation "org.spockframework:spock-junit4"  // you can remove this if your code does not rely on old JUnit 4 rules
+
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'cglib:cglib-nodep:3.3.0'
     testImplementation 'org.jsoup:jsoup:1.16.1'
