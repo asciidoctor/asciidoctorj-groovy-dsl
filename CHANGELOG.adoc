@@ -15,11 +15,11 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Improvements::
 
-* Upgrade to Gradle 8.0.2 https://github.com/asciidoctor/asciidoctorj-groovy-dsl/pull/34[#34]
-* Upgrade to AsciidoctorJ 3.0.0 (Breaking) https://github.com/asciidoctor/asciidoctorj-groovy-dsl/pull/35[#35]
+* Upgrade to AsciidoctorJ 3.0.0 (Breaking) https://github.com/asciidoctor/asciidoctorj-groovy-dsl/pull/37[#37]
 
 Build improvements::
 
+* Upgrade to Gradle 8.5 https://github.com/asciidoctor/asciidoctorj-groovy-dsl/pull/37[#37]
 * Release from Github actions https://github.com/asciidoctor/asciidoctorj-groovy-dsl/pull/36[#36]
 
 == 2.0.2
