@@ -21,7 +21,7 @@ ext {
     (buildDateOnly, buildTimeOnly) = new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm:ss.SSSZ').format(buildDateTime).split(' ')
     projectArtifactId = 'asciidoctorj-groovy-dsl'
     publicationName = 'asciidoctorjGroovyDsl'
-    groovyVer = '3.0.22'
+    groovyVer = '3.0.25'
 }
 
 apply plugin: 'groovy'
@@ -36,7 +36,7 @@ repositories {
 
 dependencies {
     implementation "org.codehaus.groovy:groovy:${groovyVer}"
-    implementation 'org.asciidoctor:asciidoctorj:3.0.0'
+    implementation 'org.asciidoctor:asciidoctorj:3.0.1'
 
     testImplementation platform("org.spockframework:spock-bom:2.3-groovy-3.0")
     testImplementation "org.spockframework:spock-core"
@@ -44,7 +44,7 @@ dependencies {
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'cglib:cglib-nodep:3.3.0'
-    testImplementation 'org.jsoup:jsoup:1.16.1'
+    testImplementation 'org.jsoup:jsoup:1.22.1'
 }
 
 codenarc {
